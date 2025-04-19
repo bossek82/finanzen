@@ -7,5 +7,135 @@
 </head>
 <body>
     <h1>Rentenlücke</h1>
+    <!-- Kurze Info worum es geht -->
+    <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
+
+    <!-- Eingabefelder -->
+    <form id="rentenluecke-form">
+        <fieldset>
+            <legend>Einnahmen</legend>
+
+            <label for="nettoeinkommen">Nettoeinkommen aktuell (€):</label>
+            <input type="number" id="nettoeinkommen" name="nettoeinkommen" value="5000" required><br>
+
+            <label for="gehaltswachstum">Gehaltswachstum (% pro Jahr):</label>
+            <input type="number" id="gehaltswachstum" name="gehaltswachstum" value="1.5" step="0.1" required><br>
+
+            <label for="entfallende-ausgaben">Aktuelle Ausgaben, die in der Rente entfallen (€):</label>
+            <input type="number" id="entfallende-ausgaben" name="entfallende-ausgaben" value="1200" required><br>
+        </fieldset>
+
+        <fieldset>
+            <legend>Vermögen</legend>
+
+            <label for="sparruecklage">Monatliche Sparrücklage (€):</label>
+            <input type="number" id="sparruecklage" name="sparruecklage" value="1000" required><br>
+
+            <label for="kapital">Vorhandenes Kapital (€):</label>
+            <input type="number" id="kapital" name="kapital" value="10000" required><br>
+
+            <label for="zinssatz">Jährlicher Zinssatz Sparvermögen (%):</label>
+            <input type="number" id="zinssatz" name="zinssatz" value="6" step="0.1" required><br>
+        </fieldset>
+
+        <fieldset>
+            <legend>Rente</legend>
+
+            <label for="jahre-bis-rente">Jahre bis zur Rente:</label>
+            <input type="number" id="jahre-bis-rente" name="jahre-bis-rente" value="24" required><br>
+
+            <label for="geschaetzte-rente">Geschätzte Rente (€):</label>
+            <input type="number" id="geschaetzte-rente" name="geschaetzte-rente" value="2200" required><br>
+
+            <label for="jahre-ab-rente">Jahre ab Rente bis zum Tod:</label>
+            <input type="number" id="jahre-ab-rente" name="jahre-ab-rente" value="20" required><br>
+        </fieldset>
+
+        <label for="inflation">Inflation (% pro Jahr):</label>
+        <input type="number" id="inflation" name="inflation" value="2" step="0.1" required><br>
+
+        <button type="button" id="berechnen-button">Berechnen</button>
+    </form>
+
+    <!-- Bereich für berechnete Werte -->
+    <div id="berechnete-werte-bis-rente">
+        <h2>Berechnete Werte bis Renteneintritt</h2>
+        <canvas id="nettoeinkommen-graph" width="400" height="200"></canvas>
+        <script>
+            document.getElementById('berechnen-button').addEventListener('click', function () {
+            const nettoeinkommen = parseFloat(document.getElementById('nettoeinkommen').value);
+            const gehaltswachstum = parseFloat(document.getElementById('gehaltswachstum').value) / 100;
+            const jahreBisRente = parseInt(document.getElementById('jahre-bis-rente').value);
+
+            const nettoeinkommenJahre = [];
+            let aktuellesEinkommen = nettoeinkommen;
+
+            for (let jahr = 0; jahr <= jahreBisRente; jahr++) {
+                nettoeinkommenJahre.push({ jahr, einkommen: aktuellesEinkommen });
+                aktuellesEinkommen += aktuellesEinkommen * gehaltswachstum;
+            }
+
+            const ctx = document.getElementById('nettoeinkommen-graph').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                labels: nettoeinkommenJahre.map(item => `Jahr ${item.jahr}`),
+                datasets: [{
+                    label: 'Nettoeinkommen (€)',
+                    data: nettoeinkommenJahre.map(item => item.einkommen.toFixed(2)),
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    fill: false
+                }]
+                },
+                options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                    display: true,
+                    position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                    title: {
+                        display: true,
+                        text: 'Jahre bis Rente'
+                    }
+                    },
+                    y: {
+                    title: {
+                        display: true,
+                        text: 'Nettoeinkommen (€)'
+                    },
+                    beginAtZero: true
+                    }
+                }
+                }
+            });
+            });
+        </script>
+    </div>
+
+    <div id="graphen-bis-rente">
+        <h2>Graphen bis Renteneintritt</h2>
+        <!-- Hier werden die Graphen bis Renteneintritt angezeigt -->
+    </div>
+
+    <div id="berechnete-werte-waehrend-rente">
+        <h2>Berechnete Werte während der Rente</h2>
+        <!-- Hier werden die Ergebnisse während der Rente angezeigt -->
+    </div>
+
+    <div id="graphen-waehrend-rente">
+        <h2>Graphen während der Rente</h2>
+        <!-- Hier werden die Graphen für die Zeit während der Rente angezeigt -->
+    </div>
+
+    <div id="graphen">
+        <!-- Hier werden die Graphen angezeigt -->
+    </div>
+
+    <a href="index.html">Zurück zur Übersicht</a>
 </body>
 </html>
