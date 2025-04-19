@@ -58,9 +58,9 @@
         <button type="button" id="berechnen-button">Berechnen</button>
     </form>
 
-    <!-- Bereich für berechnete Werte -->
+    <!-- Bereich für berechneten Bedarf bis Rente-->
     <div id="berechnete-werte-bis-rente">
-        <h2>Berechnete Werte bis Renteneintritt</h2>
+        <h2>Berechneter Monatlicher Bedarf bis Renteneintritt</h2>
         <canvas id="nettoeinkommen-graph" width="400" height="200"></canvas>
         <div id="berechnete-ergebnisse">
             <p id="nettoeinkommen-am-anfang"></p>
@@ -78,14 +78,19 @@
 
                 const nettoeinkommenJahre = [];
                 const lebensstandardJahre = [];
+                const sparruecklageJahre = [];
+                const entfallendeAusgabenJahre = [];
                 let aktuellesEinkommen = nettoeinkommen;
 
                 for (let jahr = 0; jahr <= jahreBisRente; jahr++) {
                     nettoeinkommenJahre.push({ jahr, einkommen: aktuellesEinkommen });
                     const lebensstandard = aktuellesEinkommen - entfallendeAusgaben - sparruecklage;
                     lebensstandardJahre.push({ jahr, lebensstandard });
+                    sparruecklageJahre.push({ jahr, sparruecklage });
+                    entfallendeAusgabenJahre.push({ jahr, entfallendeAusgaben });
                     aktuellesEinkommen += aktuellesEinkommen * gehaltswachstum;
                 }
+
                 // Wert des Nettoeinkommens am Anfang
                 const nettoeinkommenAmAnfang = nettoeinkommenJahre[0].einkommen;
                 document.getElementById('nettoeinkommen-am-anfang').textContent = `Nettoeinkommen am Anfang (entsprechend Eingabewert): ${nettoeinkommenAmAnfang.toFixed(2)} €`;
@@ -121,6 +126,20 @@
                                 borderColor: 'green',
                                 borderWidth: 2,
                                 fill: false
+                            },
+                            {
+                                label: 'Sparrücklage (€)',
+                                data: sparruecklageJahre.map(item => item.sparruecklage.toFixed(2)),
+                                borderColor: 'orange',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Entfallende Ausgaben (€)',
+                                data: entfallendeAusgabenJahre.map(item => item.entfallendeAusgaben.toFixed(2)),
+                                borderColor: 'red',
+                                borderWidth: 2,
+                                fill: false
                             }
                         ]
                     },
@@ -153,7 +172,6 @@
         </script>
     </div>
 
-
         <!-- Bis Rente:
          Monatlicher Bedarf berechnen bis zeitpunkt Rente
          Sparvermögen berechnen bis Rente
@@ -171,7 +189,64 @@
 
     <div id="graphen-bis-rente">
         <h2>Graphen bis Renteneintritt</h2>
-        <!-- Hier werden die Graphen bis Renteneintritt angezeigt -->
+        <canvas id="vermoegensaufbau-graph" width="400" height="200"></canvas>
+        <script>
+            document.getElementById('berechnen-button').addEventListener('click', function () {
+                const sparruecklage = parseFloat(document.getElementById('sparruecklage').value);
+                const kapital = parseFloat(document.getElementById('kapital').value);
+                const zinssatz = parseFloat(document.getElementById('zinssatz').value) / 100;
+                const jahreBisRente = parseInt(document.getElementById('jahre-bis-rente').value);
+
+                const vermoegenJahre = [];
+                let aktuellesVermoegen = kapital;
+
+                for (let jahr = 0; jahr <= jahreBisRente; jahr++) {
+                    vermoegenJahre.push({ jahr, vermoegen: aktuellesVermoegen });
+                    aktuellesVermoegen += (aktuellesVermoegen * zinssatz) + (sparruecklage * 12);
+                }
+
+                const ctx = document.getElementById('vermoegensaufbau-graph').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: vermoegenJahre.map(item => `Jahr ${item.jahr}`),
+                        datasets: [
+                            {
+                                label: 'Vermögensaufbau (€)',
+                                data: vermoegenJahre.map(item => item.vermoegen.toFixed(2)),
+                                borderColor: 'orange',
+                                borderWidth: 2,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Jahre bis Rente'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Vermögen (€)'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
     </div>
 
     <div id="berechnete-werte-waehrend-rente">
