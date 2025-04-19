@@ -61,58 +61,94 @@
     <div id="berechnete-werte-bis-rente">
         <h2>Berechnete Werte bis Renteneintritt</h2>
         <canvas id="nettoeinkommen-graph" width="400" height="200"></canvas>
+        <div id="berechnete-ergebnisse">
+            <p id="nettoeinkommen-am-anfang"></p>
+            <p id="nettoeinkommen-bei-rente"></p>
+            <p id="lebensstandard-am-anfang"></p>
+            <p id="lebensstandard-bei-rente"></p>
+        </div>
         <script>
             document.getElementById('berechnen-button').addEventListener('click', function () {
-            const nettoeinkommen = parseFloat(document.getElementById('nettoeinkommen').value);
-            const gehaltswachstum = parseFloat(document.getElementById('gehaltswachstum').value) / 100;
-            const jahreBisRente = parseInt(document.getElementById('jahre-bis-rente').value);
+                const nettoeinkommen = parseFloat(document.getElementById('nettoeinkommen').value);
+                const gehaltswachstum = parseFloat(document.getElementById('gehaltswachstum').value) / 100;
+                const jahreBisRente = parseInt(document.getElementById('jahre-bis-rente').value);
+                const entfallendeAusgaben = parseFloat(document.getElementById('entfallende-ausgaben').value);
+                const sparruecklage = parseFloat(document.getElementById('sparruecklage').value);
 
-            const nettoeinkommenJahre = [];
-            let aktuellesEinkommen = nettoeinkommen;
+                const nettoeinkommenJahre = [];
+                const lebensstandardJahre = [];
+                let aktuellesEinkommen = nettoeinkommen;
 
-            for (let jahr = 0; jahr <= jahreBisRente; jahr++) {
-                nettoeinkommenJahre.push({ jahr, einkommen: aktuellesEinkommen });
-                aktuellesEinkommen += aktuellesEinkommen * gehaltswachstum;
-            }
-
-            const ctx = document.getElementById('nettoeinkommen-graph').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                labels: nettoeinkommenJahre.map(item => `Jahr ${item.jahr}`),
-                datasets: [{
-                    label: 'Nettoeinkommen (€)',
-                    data: nettoeinkommenJahre.map(item => item.einkommen.toFixed(2)),
-                    borderColor: 'blue',
-                    borderWidth: 2,
-                    fill: false
-                }]
-                },
-                options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                    display: true,
-                    position: 'top'
-                    }
-                },
-                scales: {
-                    x: {
-                    title: {
-                        display: true,
-                        text: 'Jahre bis Rente'
-                    }
-                    },
-                    y: {
-                    title: {
-                        display: true,
-                        text: 'Nettoeinkommen (€)'
-                    },
-                    beginAtZero: true
-                    }
+                for (let jahr = 0; jahr <= jahreBisRente; jahr++) {
+                    nettoeinkommenJahre.push({ jahr, einkommen: aktuellesEinkommen });
+                    const lebensstandard = aktuellesEinkommen - entfallendeAusgaben - sparruecklage;
+                    lebensstandardJahre.push({ jahr, lebensstandard });
+                    aktuellesEinkommen += aktuellesEinkommen * gehaltswachstum;
                 }
-                }
-            });
+
+                // Wert des Nettoeinkommens am Anfang
+                const nettoeinkommenAmAnfang = nettoeinkommenJahre[0].einkommen;
+                document.getElementById('nettoeinkommen-am-anfang').textContent = `Nettoeinkommen am Anfang: ${nettoeinkommenAmAnfang.toFixed(2)} €`;
+
+                // Wert des Nettoeinkommens bei Renteneintritt
+                const nettoeinkommenBeiRente = nettoeinkommenJahre[jahreBisRente].einkommen;
+                document.getElementById('nettoeinkommen-bei-rente').textContent = `Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} €`;
+
+                // Wert des Lebensstandards am Anfang
+                const lebensstandardAmAnfang = lebensstandardJahre[0].lebensstandard;
+                document.getElementById('lebensstandard-am-anfang').textContent = `Lebensstandard am Anfang: ${lebensstandardAmAnfang.toFixed(2)} €`;
+
+                // Wert des Lebensstandards bei Renteneintritt
+                const lebensstandardBeiRente = lebensstandardJahre[jahreBisRente].lebensstandard;
+                document.getElementById('lebensstandard-bei-rente').textContent = `Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} €`;
+
+                const ctx = document.getElementById('nettoeinkommen-graph').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: nettoeinkommenJahre.map(item => `Jahr ${item.jahr}`),
+                        datasets: [
+                            {
+                                label: 'Nettoeinkommen (€)',
+                                data: nettoeinkommenJahre.map(item => item.einkommen.toFixed(2)),
+                                borderColor: 'blue',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Lebensstandard (€)',
+                                data: lebensstandardJahre.map(item => item.lebensstandard.toFixed(2)),
+                                borderColor: 'green',
+                                borderWidth: 2,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Jahre bis Rente'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Betrag (€)'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
             });
         </script>
     </div>
