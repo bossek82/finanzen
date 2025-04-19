@@ -86,22 +86,21 @@
                     lebensstandardJahre.push({ jahr, lebensstandard });
                     aktuellesEinkommen += aktuellesEinkommen * gehaltswachstum;
                 }
-
                 // Wert des Nettoeinkommens am Anfang
                 const nettoeinkommenAmAnfang = nettoeinkommenJahre[0].einkommen;
-                document.getElementById('nettoeinkommen-am-anfang').textContent = `Nettoeinkommen am Anfang: ${nettoeinkommenAmAnfang.toFixed(2)} €`;
+                document.getElementById('nettoeinkommen-am-anfang').textContent = `Nettoeinkommen am Anfang (entsprechend Eingabewert): ${nettoeinkommenAmAnfang.toFixed(2)} €`;
 
                 // Wert des Nettoeinkommens bei Renteneintritt
                 const nettoeinkommenBeiRente = nettoeinkommenJahre[jahreBisRente].einkommen;
-                document.getElementById('nettoeinkommen-bei-rente').textContent = `Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} €`;
+                document.getElementById('nettoeinkommen-bei-rente').textContent = `Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € (ausgehend von aktuellem Nettoeinkommen: ${nettoeinkommen.toFixed(2)} €, Gehaltswachstum: ${(gehaltswachstum * 100).toFixed(1)} % pro Jahr, über ${jahreBisRente} Jahre)`;
 
                 // Wert des Lebensstandards am Anfang
                 const lebensstandardAmAnfang = lebensstandardJahre[0].lebensstandard;
-                document.getElementById('lebensstandard-am-anfang').textContent = `Lebensstandard am Anfang: ${lebensstandardAmAnfang.toFixed(2)} €`;
+                document.getElementById('lebensstandard-am-anfang').textContent = `Lebensstandard am Anfang: ${lebensstandardAmAnfang.toFixed(2)} € (= Nettoeinkommen: ${nettoeinkommen.toFixed(2)} € - Entfallende Ausgaben: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
 
                 // Wert des Lebensstandards bei Renteneintritt
-                const lebensstandardBeiRente = lebensstandardJahre[jahreBisRente].lebensstandard;
-                document.getElementById('lebensstandard-bei-rente').textContent = `Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} €`;
+                const lebensstandardBeiRente = nettoeinkommenBeiRente - entfallendeAusgaben - sparruecklage;
+                document.getElementById('lebensstandard-bei-rente').textContent = `Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} € (= Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € - Entfallende Ausgaben: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
 
                 const ctx = document.getElementById('nettoeinkommen-graph').getContext('2d');
                 new Chart(ctx, {
@@ -153,6 +152,22 @@
             });
         </script>
     </div>
+
+
+        <!-- Bis Rente:
+         Monatlicher Bedarf berechnen bis zeitpunkt Rente
+         Sparvermögen berechnen bis Rente
+          -->
+
+
+        <!-- Ab Rente:
+        Inflation auf verbrauch aufrechnen
+        Rentenentwicklung berechnen 
+        Monatliche Rente abziehen
+        ...ohne Sparentnahme
+        Delta durch Sparentnahme schließen
+        Wertentwicklung vermögen
+          -->
 
     <div id="graphen-bis-rente">
         <h2>Graphen bis Renteneintritt</h2>
