@@ -7,5 +7,52 @@
 </head>
 <body>
     <h1>Investmentverteilung</h1>
+    <label for="vermoegen">Vermögen:</label>
+    <input type="number" id="vermoegen" name="vermoegen" value="50000">
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nicht volatil (Tagesgeld)</th>
+                <th>Leicht volatil (Gold)</th>
+                <th>Mittel volatil (MSCI World)</th>
+                <th>Sehr volatil (Bitcoin)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" id="tagesgeldProzent" value="0" min="0" max="100"></td>
+                <td><input type="number" id="goldProzent" value="0" min="0" max="100"></td>
+                <td><input type="number" id="msciProzent" value="0" min="0" max="100"></td>
+                <td><input type="number" id="bitcoinProzent" value="0" min="0" max="100"></td>
+            </tr>
+            <tr>
+                <td id="tagesgeldWert">0</td>
+                <td id="goldWert">0</td>
+                <td id="msciWert">0</td>
+                <td id="bitcoinWert">0</td>
+            </tr>
+        </tbody>
+    </table>
+    <button onclick="berechneWerte()">Berechnen</button>
+
+    <script>
+        function berechneWerte() {
+            const vermoegen = parseFloat(document.getElementById('vermoegen').value);
+            const tagesgeldProzent = parseFloat(document.getElementById('tagesgeldProzent').value) || 0;
+            const goldProzent = parseFloat(document.getElementById('goldProzent').value) || 0;
+            const msciProzent = parseFloat(document.getElementById('msciProzent').value) || 0;
+            const bitcoinProzent = parseFloat(document.getElementById('bitcoinProzent').value) || 0;
+
+            const tagesgeldWert = (vermoegen * tagesgeldProzent) / 100;
+            const goldWert = (vermoegen * goldProzent) / 100;
+            const msciWert = (vermoegen * msciProzent) / 100;
+            const bitcoinWert = (vermoegen * bitcoinProzent) / 100;
+
+            document.getElementById('tagesgeldWert').textContent = tagesgeldWert.toFixed(2);
+            document.getElementById('goldWert').textContent = goldWert.toFixed(2);
+            document.getElementById('msciWert').textContent = msciWert.toFixed(2);
+            document.getElementById('bitcoinWert').textContent = bitcoinWert.toFixed(2);
+        }
+    </script>
 </body>
 </html>
