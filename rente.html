@@ -271,13 +271,7 @@
     </div>
 
 
-    <!-- Inflation auf verbrauch aufrechnen 
-     Rentenentwicklung berechnen 
-     Monatliche Rente abziehen 
-     ...ohne Sparentnahme 
-     Delta durch Sparentnahme schließen 
-     Wertentwicklung vermögen -->
-
+ 
 
     <div id="monatlicher-bedarf-ab-rente">
         <h2>Monatlicher Bedarf und geschätzte Rente ab Renteneintritt bis Tod</h2>
@@ -285,6 +279,7 @@
         <div id="bedarf-und-rente-ab-rente-ergebnisse">
             <p id="lebensstandard-bei-tod"></p>
             <p id="rente-bei-tod"></p>
+            <p id="delta-bei-tod"></p>
         </div>
         <script>
             document.getElementById('berechnen-button').addEventListener('click', function () {
@@ -296,12 +291,14 @@
 
                 const bedarfJahre = [];
                 const renteJahre = [];
+                const deltaJahre = [];
                 let aktuellerBedarf = lebensstandardBeiRente;
                 let aktuelleRente = geschaetzteRente;
 
                 for (let jahr = 0; jahr <= jahreAbRente; jahr++) {
                     bedarfJahre.push({ jahr, bedarf: aktuellerBedarf });
                     renteJahre.push({ jahr, rente: aktuelleRente });
+                    deltaJahre.push({ jahr, delta: aktuellerBedarf - aktuelleRente });
                     aktuellerBedarf += aktuellerBedarf * inflation;
                     aktuelleRente += aktuelleRente * rentenentwicklung;
                 }
@@ -311,6 +308,9 @@
 
                 const renteBeiTod = renteJahre[jahreAbRente].rente;
                 document.getElementById('rente-bei-tod').textContent = `Geschätzte Rente bei Tod: ${renteBeiTod.toFixed(2)} € (inkl. Rentenentwicklung von ${(rentenentwicklung * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
+
+                const deltaBeiTod = deltaJahre[jahreAbRente].delta;
+                document.getElementById('delta-bei-tod').textContent = `Delta bei Tod (Bedarf - Rente): ${deltaBeiTod.toFixed(2)} €`;
 
                 const ctx = document.getElementById('bedarf-und-rente-ab-rente-graph').getContext('2d');
                 new Chart(ctx, {
@@ -329,6 +329,13 @@
                                 label: 'Geschätzte Rente (€)',
                                 data: renteJahre.map(item => item.rente.toFixed(2)),
                                 borderColor: 'green',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Delta (Bedarf - Rente) (€)',
+                                data: deltaJahre.map(item => item.delta.toFixed(2)),
+                                borderColor: 'red',
                                 borderWidth: 2,
                                 fill: false
                             }
