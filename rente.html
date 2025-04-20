@@ -56,7 +56,7 @@
       </style>
 </head>
 <body>
-    <h1>Rentenlücke 7</h1>
+    <h1>Rentenlücke 8</h1>
     <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
 
     <form id="rentenluecke-form">
@@ -416,12 +416,12 @@
                 });
             });
         </script>
-    </div>
     <div id="vermoegensentwicklung-ab-rente">
         <h2>Vermögensentwicklung ab Rente bis Tod</h2>
         <canvas id="vermoegensentwicklung-ab-rente-graph" width="400" height="200"></canvas>
         <div id="vermoegensentwicklung-ab-rente-ergebnisse">
             <p id="vermoegen-bei-tod"></p>
+            <p id="vermoegen-ohne-entnahme-bei-tod"></p>
             <p id="entnommenes-vermoegen"></p>
             <p id="delta-pro-jahr"></p>
         </div>
@@ -436,9 +436,11 @@
                 const jahreAbRente = parseInt(document.getElementById('jahre-ab-rente').value);
 
                 const vermoegenJahre = [];
+                const vermoegenOhneEntnahmeJahre = [];
                 const entnommenesVermoegenJahre = [];
                 const deltaJahre = [];
                 let aktuellesVermoegen = vermoegenBeiRente;
+                let vermoegenOhneEntnahme = vermoegenBeiRente;
                 let gesamtEntnommen = 0;
                 let aktuellerBedarf = lebensstandardBeiRente;
                 let aktuelleRente = geschaetzteRente;
@@ -449,7 +451,9 @@
                     gesamtEntnommen += entnommen;
                     aktuellesVermoegen -= entnommen; // Subtract yearly delta
                     aktuellesVermoegen += aktuellesVermoegen * zinssatz; // Add interest
+                    vermoegenOhneEntnahme += vermoegenOhneEntnahme * zinssatz; // Add interest without withdrawal
                     vermoegenJahre.push({ jahr, vermoegen: aktuellesVermoegen });
+                    vermoegenOhneEntnahmeJahre.push({ jahr, vermoegen: vermoegenOhneEntnahme });
                     entnommenesVermoegenJahre.push({ jahr, entnommen: gesamtEntnommen });
                     deltaJahre.push({ jahr, delta });
 
@@ -460,11 +464,14 @@
                 const vermoegenBeiTod = vermoegenJahre[jahreAbRente].vermoegen;
                 document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod: ${vermoegenBeiTod.toFixed(2)} € (berechnet aus Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %)`;
 
+                const vermoegenOhneEntnahmeBeiTod = vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegen;
+                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeBeiTod.toFixed(2)} €`;
+
                 const gesamtEntnommenesVermoegen = gesamtEntnommen;
                 document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommenesVermoegen.toFixed(2)} €`;
 
-                const deltaProJahr = deltaJahre.map(item => `Jahr ${item.jahr}: ${item.delta.toFixed(2)} €`).join(', ');
-                document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr: ${deltaProJahr}`;
+                const deltaProJahr = deltaJahre.map(item => `Jahr ${item.jahr}: ${(item.delta * 12).toFixed(2)} € (monatlich: ${item.delta.toFixed(2)} €)`).join(', ');
+                document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr (hochgerechnet): ${deltaProJahr}`;
 
                 const ctx = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
                 new Chart(ctx, {
@@ -476,6 +483,13 @@
                                 label: 'Vermögen (€)',
                                 data: vermoegenJahre.map(item => item.vermoegen.toFixed(2)),
                                 borderColor: 'purple',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Vermögen ohne Entnahme (€)',
+                                data: vermoegenOhneEntnahmeJahre.map(item => item.vermoegen.toFixed(2)),
+                                borderColor: 'green',
                                 borderWidth: 2,
                                 fill: false
                             },
