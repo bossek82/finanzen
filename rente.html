@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Rentenlücke 5</h1>
+    <h1>Rentenlücke 6</h1>
     <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
 
     <form id="rentenluecke-form">
@@ -370,8 +370,90 @@
         </script>
     </div>
 
-    <div id="graphen-waehrend-rente">
-        <h2>Graphen während der Rente</h2>
+    <div id="vermoegensentwicklung-ab-rente">
+        <h2>Vermögensentwicklung ab Rente bis Tod</h2>
+        <canvas id="vermoegensentwicklung-ab-rente-graph" width="400" height="200"></canvas>
+        <div id="vermoegensentwicklung-ab-rente-ergebnisse">
+            <p id="vermoegen-bei-tod"></p>
+            <p id="entnommenes-vermoegen"></p>
+        </div>
+        <script>
+            document.getElementById('berechnen-button').addEventListener('click', function () {
+                const vermoegenBeiRente = parseFloat(document.getElementById('vermoegen-bei-rente').textContent.match(/[\d,.]+/)[0].replace(',', '.'));
+                const deltaJahre = JSON.parse(document.getElementById('bedarf-und-rente-ab-rente-graph').dataset.deltaJahre || '[]');
+                const zinssatz = parseFloat(document.getElementById('zinssatz').value) / 100;
+                const jahreAbRente = parseInt(document.getElementById('jahre-ab-rente').value);
+
+                const vermoegenJahre = [];
+                const entnommenesVermoegenJahre = [];
+                let aktuellesVermoegen = vermoegenBeiRente;
+                let gesamtEntnommen = 0;
+
+                for (let jahr = 0; jahr <= jahreAbRente; jahr++) {
+                    const delta = deltaJahre[jahr]?.delta || 0;
+                    const entnommen = delta * 12; // Yearly delta
+                    gesamtEntnommen += entnommen;
+                    aktuellesVermoegen -= entnommen; // Subtract yearly delta
+                    aktuellesVermoegen += aktuellesVermoegen * zinssatz; // Add interest
+                    vermoegenJahre.push({ jahr, vermoegen: aktuellesVermoegen });
+                    entnommenesVermoegenJahre.push({ jahr, entnommen: gesamtEntnommen });
+                }
+
+                const vermoegenBeiTod = vermoegenJahre[jahreAbRente].vermoegen;
+                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod: ${vermoegenBeiTod.toFixed(2)} € (berechnet aus Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %, und jährlicher Entnahme: ${gesamtEntnommen.toFixed(2)} €)`;
+
+                const gesamtEntnommenesVermoegen = gesamtEntnommen;
+                document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommenesVermoegen.toFixed(2)} € (berechnet aus jährlichem Delta: ${deltaJahre.map(item => item.delta.toFixed(2)).join(', ')} €)`;
+
+                const ctx = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: vermoegenJahre.map(item => `Jahr ${item.jahr}`),
+                        datasets: [
+                            {
+                                label: 'Vermögen (€)',
+                                data: vermoegenJahre.map(item => item.vermoegen.toFixed(2)),
+                                borderColor: 'purple',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Entnommenes Vermögen (€)',
+                                data: entnommenesVermoegenJahre.map(item => item.entnommen.toFixed(2)),
+                                borderColor: 'red',
+                                borderWidth: 2,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Jahre ab Rente'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Betrag (€)'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
     </div>
 
     <div id="graphen"></div>
