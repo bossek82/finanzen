@@ -56,7 +56,7 @@
       </style>
 </head>
 <body>
-    <h1>Rentenlücke 8</h1>
+    <h1>Rentenlücke 9</h1>
     <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
 
     <form id="rentenluecke-form">
@@ -462,16 +462,15 @@
                 }
 
                 const vermoegenBeiTod = vermoegenJahre[jahreAbRente].vermoegen;
-                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod: ${vermoegenBeiTod.toFixed(2)} € (berechnet aus Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %)`;
+                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod bei Entnahme: ${vermoegenBeiTod.toFixed(2)} € (berechnet aus Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %, unter Berücksichtigung der jährlichen Entnahmen).`;
 
                 const vermoegenOhneEntnahmeBeiTod = vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegen;
-                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeBeiTod.toFixed(2)} €`;
+                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeBeiTod.toFixed(2)} € (berechnet aus Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %, ohne Berücksichtigung von Entnahmen).`;
 
                 const gesamtEntnommenesVermoegen = gesamtEntnommen;
-                document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommenesVermoegen.toFixed(2)} €`;
-
+                document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommenesVermoegen.toFixed(2)} € (berechnet aus jährlichem Delta zwischen Bedarf und Rente, multipliziert mit 12 Monaten, über ${jahreAbRente} Jahre).`;
                 const deltaProJahr = deltaJahre.map(item => `Jahr ${item.jahr}: ${(item.delta * 12).toFixed(2)} € (monatlich: ${item.delta.toFixed(2)} €)`).join(', ');
-                document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr (hochgerechnet): ${deltaProJahr}`;
+                document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr (hochgerechnet): ${deltaProJahr} (berechnet aus dem jährlichen Delta zwischen Bedarf und geschätzter Rente, multipliziert mit 12 Monaten).`;
 
                 const ctx = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
                 new Chart(ctx, {

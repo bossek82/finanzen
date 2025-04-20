@@ -1,58 +1,201 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Investmentverteilung</title>
-</head>
-<body>
-    <h1>Investmentverteilung</h1>
-    <label for="vermoegen">Vermögen:</label>
-    <input type="number" id="vermoegen" name="vermoegen" value="50000">
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Nicht volatil (Tagesgeld)</th>
-                <th>Leicht volatil (Gold)</th>
-                <th>Mittel volatil (MSCI World)</th>
-                <th>Sehr volatil (Bitcoin)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="number" id="tagesgeldProzent" value="0" min="0" max="100"></td>
-                <td><input type="number" id="goldProzent" value="0" min="0" max="100"></td>
-                <td><input type="number" id="msciProzent" value="0" min="0" max="100"></td>
-                <td><input type="number" id="bitcoinProzent" value="0" min="0" max="100"></td>
-            </tr>
-            <tr>
-                <td id="tagesgeldWert">0</td>
-                <td id="goldWert">0</td>
-                <td id="msciWert">0</td>
-                <td id="bitcoinWert">0</td>
-            </tr>
-        </tbody>
-    </table>
-    <button onclick="berechneWerte()">Berechnen</button>
+<script>
+    function berechneWerte() {
+        const vermoegen = parseFloat(document.getElementById('vermoegen').value);
+        const anlagezeit = parseInt(document.getElementById('anlagezeit').value);
+        const tagesgeldProzent = parseFloat(document.getElementById('tagesgeldProzent').value) || 0;
+        const goldProzent = parseFloat(document.getElementById('goldProzent').value) || 0;
+        const msciProzent = parseFloat(document.getElementById('msciProzent').value) || 0;
+        const bitcoinProzent = parseFloat(document.getElementById('bitcoinProzent').value) || 0;
 
-    <script>
-        function berechneWerte() {
-            const vermoegen = parseFloat(document.getElementById('vermoegen').value);
-            const tagesgeldProzent = parseFloat(document.getElementById('tagesgeldProzent').value) || 0;
-            const goldProzent = parseFloat(document.getElementById('goldProzent').value) || 0;
-            const msciProzent = parseFloat(document.getElementById('msciProzent').value) || 0;
-            const bitcoinProzent = parseFloat(document.getElementById('bitcoinProzent').value) || 0;
+        const tagesgeldEntwicklung = parseFloat(document.getElementById('tagesgeldEntwicklung').value) || 0;
+        const goldEntwicklung = parseFloat(document.getElementById('goldEntwicklung').value) || 0;
+        const msciEntwicklung = parseFloat(document.getElementById('msciEntwicklung').value) || 0;
+        const bitcoinEntwicklung = parseFloat(document.getElementById('bitcoinEntwicklung').value) || 0;
 
-            const tagesgeldWert = (vermoegen * tagesgeldProzent) / 100;
-            const goldWert = (vermoegen * goldProzent) / 100;
-            const msciWert = (vermoegen * msciProzent) / 100;
-            const bitcoinWert = (vermoegen * bitcoinProzent) / 100;
+        const tagesgeldWert = (vermoegen * tagesgeldProzent) / 100;
+        const goldWert = (vermoegen * goldProzent) / 100;
+        const msciWert = (vermoegen * msciProzent) / 100;
+        const bitcoinWert = (vermoegen * bitcoinProzent) / 100;
 
-            document.getElementById('tagesgeldWert').textContent = tagesgeldWert.toFixed(2);
-            document.getElementById('goldWert').textContent = goldWert.toFixed(2);
-            document.getElementById('msciWert').textContent = msciWert.toFixed(2);
-            document.getElementById('bitcoinWert').textContent = bitcoinWert.toFixed(2);
+        document.getElementById('tagesgeldWert').textContent = tagesgeldWert.toFixed(2);
+        document.getElementById('goldWert').textContent = goldWert.toFixed(2);
+        document.getElementById('msciWert').textContent = msciWert.toFixed(2);
+        document.getElementById('bitcoinWert').textContent = bitcoinWert.toFixed(2);
+
+        const datasets = [];
+        const endResults = [];
+        const labels = Array.from({ length: anlagezeit }, (_, i) => i + 1);
+
+        function calculateGrowth(initial, rate) {
+            const values = [];
+            let current = initial;
+            for (let i = 0; i < anlagezeit; i++) {
+                current += current * (rate / 100);
+                values.push(current.toFixed(2));
+            }
+            return values;
         }
-    </script>
-</body>
-</html>
+
+        if (tagesgeldProzent > 0) {
+            const values = calculateGrowth(tagesgeldWert, tagesgeldEntwicklung);
+            datasets.push({
+                label: 'Tagesgeld',
+                data: values,
+                borderColor: 'blue',
+                fill: false
+            });
+            endResults.push(`Tagesgeld Endwert: ${values[values.length - 1]} EUR`);
+        }
+
+        if (goldProzent > 0) {
+            const values = calculateGrowth(goldWert, goldEntwicklung);
+            datasets.push({
+                label: 'Gold',
+                data: values,
+                borderColor: 'gold',
+                fill: false
+            });
+            endResults.push(`Gold Endwert: ${values[values.length - 1]} EUR`);
+        }
+
+        if (msciProzent > 0) {
+            const values = calculateGrowth(msciWert, msciEntwicklung);
+            datasets.push({
+                label: 'MSCI World',
+                data: values,
+                borderColor: 'green',
+                fill: false
+            });
+            endResults.push(`MSCI World Endwert: ${values[values.length - 1]} EUR`);
+        }
+
+        if (bitcoinProzent > 0) {
+            const values = calculateGrowth(bitcoinWert, bitcoinEntwicklung);
+            datasets.push({
+                label: 'Bitcoin',
+                data: values,
+                borderColor: 'orange',
+                fill: false
+            });
+            endResults.push(`Bitcoin Endwert: ${values[values.length - 1]} EUR`);
+        }
+
+        const ctx = document.getElementById('investmentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Jahre'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Wert in EUR'
+                        }
+                    }
+                }
+            }
+        });
+
+        document.getElementById('endResults').innerHTML = endResults.join('<br>');
+
+        // Call the total investment calculation after the main calculation
+        berechneGesamtentwicklung();
+    }
+
+    function berechneGesamtentwicklung() {
+        const anlagezeit = parseInt(document.getElementById('anlagezeit').value);
+        const labels = Array.from({ length: anlagezeit }, (_, i) => i + 1);
+        const totalValues = Array(anlagezeit).fill(0);
+
+        function calculateGrowth(initial, rate) {
+            const values = [];
+            let current = initial;
+            for (let i = 0; i < anlagezeit; i++) {
+                current += current * (rate / 100);
+                values.push(current);
+            }
+            return values;
+        }
+
+        if (parseFloat(document.getElementById('tagesgeldProzent').value) > 0) {
+            const tagesgeldWert = parseFloat(document.getElementById('tagesgeldWert').textContent);
+            const tagesgeldEntwicklung = parseFloat(document.getElementById('tagesgeldEntwicklung').value) || 0;
+            const values = calculateGrowth(tagesgeldWert, tagesgeldEntwicklung);
+            values.forEach((val, i) => totalValues[i] += val);
+        }
+
+        if (parseFloat(document.getElementById('goldProzent').value) > 0) {
+            const goldWert = parseFloat(document.getElementById('goldWert').textContent);
+            const goldEntwicklung = parseFloat(document.getElementById('goldEntwicklung').value) || 0;
+            const values = calculateGrowth(goldWert, goldEntwicklung);
+            values.forEach((val, i) => totalValues[i] += val);
+        }
+
+        if (parseFloat(document.getElementById('msciProzent').value) > 0) {
+            const msciWert = parseFloat(document.getElementById('msciWert').textContent);
+            const msciEntwicklung = parseFloat(document.getElementById('msciEntwicklung').value) || 0;
+            const values = calculateGrowth(msciWert, msciEntwicklung);
+            values.forEach((val, i) => totalValues[i] += val);
+        }
+
+        if (parseFloat(document.getElementById('bitcoinProzent').value) > 0) {
+            const bitcoinWert = parseFloat(document.getElementById('bitcoinWert').textContent);
+            const bitcoinEntwicklung = parseFloat(document.getElementById('bitcoinEntwicklung').value) || 0;
+            const values = calculateGrowth(bitcoinWert, bitcoinEntwicklung);
+            values.forEach((val, i) => totalValues[i] += val);
+        }
+
+        const ctx = document.getElementById('totalInvestmentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Gesamtentwicklung',
+                    data: totalValues,
+                    borderColor: 'red',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Jahre'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Wert in EUR'
+                        }
+                    }
+                }
+            }
+        });
+
+        document.getElementById('totalEndResult').textContent = `Gesamter Endwert: ${totalValues[totalValues.length - 1].toFixed(2)} EUR`;
+    }
+</script>
