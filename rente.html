@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Rentenlücke 4</h1>
+    <h1>Rentenlücke 5</h1>
     <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
 
     <form id="rentenluecke-form">
@@ -35,8 +35,7 @@
             <label for="zinssatz">Jährlicher Zinssatz Sparvermögen (%):</label>
             <input type="number" id="zinssatz" name="zinssatz" value="6" step="0.1" required><br>
         </fieldset>
-
-        <fieldset>
+        <fieldset></fieldset>
             <legend>Rente</legend>
             <label for="jahre-bis-rente">Jahre bis zur Rente:</label>
             <input type="number" id="jahre-bis-rente" name="jahre-bis-rente" value="24" required><br>
@@ -44,8 +43,12 @@
             <label for="geschaetzte-rente">Geschätzte Rente (€):</label>
             <input type="number" id="geschaetzte-rente" name="geschaetzte-rente" value="2200" required><br>
 
+            <label for="rentenentwicklung">Jährliche Rentenentwicklung (%):</label>
+            <input type="number" id="rentenentwicklung" name="rentenentwicklung" value="1" step="0.1" required><br>
+
             <label for="jahre-ab-rente">Jahre ab Rente bis zum Tod:</label>
             <input type="number" id="jahre-ab-rente" name="jahre-ab-rente" value="20" required><br>
+
         </fieldset>
 
         <label for="inflation">Inflation (% pro Jahr):</label>
@@ -276,31 +279,40 @@
      Wertentwicklung vermögen -->
 
 
-
     <div id="monatlicher-bedarf-ab-rente">
-        <h2>Monatlicher Bedarf ab Rente bis Tod</h2>
-        <canvas id="bedarf-ab-rente-graph" width="400" height="200"></canvas>
-        <div id="bedarf-ab-rente-ergebnisse">
+        <h2>Monatlicher Bedarf und geschätzte Rente ab Renteneintritt bis Tod</h2>
+        <canvas id="bedarf-und-rente-ab-rente-graph" width="400" height="200"></canvas>
+        <div id="bedarf-und-rente-ab-rente-ergebnisse">
             <p id="lebensstandard-bei-tod"></p>
+            <p id="rente-bei-tod"></p>
         </div>
         <script>
             document.getElementById('berechnen-button').addEventListener('click', function () {
                 const lebensstandardBeiRente = parseFloat(document.getElementById('lebensstandard-bei-rente').textContent.match(/[\d,.]+/)[0].replace(',', '.'));
+                const geschaetzteRente = parseFloat(document.getElementById('geschaetzte-rente').value);
+                const rentenentwicklung = parseFloat(document.getElementById('rentenentwicklung').value) / 100;
                 const inflation = parseFloat(document.getElementById('inflation').value) / 100;
                 const jahreAbRente = parseInt(document.getElementById('jahre-ab-rente').value);
 
                 const bedarfJahre = [];
+                const renteJahre = [];
                 let aktuellerBedarf = lebensstandardBeiRente;
+                let aktuelleRente = geschaetzteRente;
 
                 for (let jahr = 0; jahr <= jahreAbRente; jahr++) {
                     bedarfJahre.push({ jahr, bedarf: aktuellerBedarf });
+                    renteJahre.push({ jahr, rente: aktuelleRente });
                     aktuellerBedarf += aktuellerBedarf * inflation;
+                    aktuelleRente += aktuelleRente * rentenentwicklung;
                 }
 
                 const lebensstandardBeiTod = bedarfJahre[jahreAbRente].bedarf;
                 document.getElementById('lebensstandard-bei-tod').textContent = `Lebensstandard bei Tod: ${lebensstandardBeiTod.toFixed(2)} € (inkl. Inflation von ${(inflation * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
 
-                const ctx = document.getElementById('bedarf-ab-rente-graph').getContext('2d');
+                const renteBeiTod = renteJahre[jahreAbRente].rente;
+                document.getElementById('rente-bei-tod').textContent = `Geschätzte Rente bei Tod: ${renteBeiTod.toFixed(2)} € (inkl. Rentenentwicklung von ${(rentenentwicklung * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
+
+                const ctx = document.getElementById('bedarf-und-rente-ab-rente-graph').getContext('2d');
                 new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -310,6 +322,13 @@
                                 label: 'Monatlicher Bedarf (€)',
                                 data: bedarfJahre.map(item => item.bedarf.toFixed(2)),
                                 borderColor: 'blue',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Geschätzte Rente (€)',
+                                data: renteJahre.map(item => item.rente.toFixed(2)),
+                                borderColor: 'green',
                                 borderWidth: 2,
                                 fill: false
                             }
