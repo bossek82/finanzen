@@ -455,7 +455,7 @@
                     vermoegenJahre.push({ jahr, vermoegen: aktuellesVermoegen });
                     vermoegenOhneEntnahmeJahre.push({ jahr, vermoegen: vermoegenOhneEntnahme });
                     entnommenesVermoegenJahre.push({ jahr, entnommen: gesamtEntnommen });
-                    deltaJahre.push({ jahr, delta });
+                    deltaJahre.push({ jahr, delta: delta * 12 }); // Store yearly delta
 
                     aktuellerBedarf += aktuellerBedarf * inflation;
                     aktuelleRente += aktuelleRente * rentenentwicklung;
@@ -469,8 +469,8 @@
 
                 const gesamtEntnommenesVermoegen = gesamtEntnommen;
                 document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommenesVermoegen.toFixed(2)} € (berechnet aus jährlichem Delta zwischen Bedarf und Rente, multipliziert mit 12 Monaten, über ${jahreAbRente} Jahre).`;
-                const deltaProJahr = deltaJahre.map(item => `Jahr ${item.jahr}: ${(item.delta * 12).toFixed(2)} € (monatlich: ${item.delta.toFixed(2)} €)`).join(', ');
-                document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr (hochgerechnet): ${deltaProJahr} (berechnet aus dem jährlichen Delta zwischen Bedarf und geschätzter Rente, multipliziert mit 12 Monaten).`;
+                const deltaProJahr = deltaJahre.map(item => `Jahr ${item.jahr}: ${item.delta.toFixed(2)} €`).join(', ');
+                document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr (hochgerechnet): ${deltaProJahr} (berechnet aus dem jährlichen Delta zwischen Bedarf und geschätzter Rente).`;
 
                 const ctx = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
                 new Chart(ctx, {
@@ -501,7 +501,7 @@
                             },
                             {
                                 label: 'Delta (Bedarf - Rente) (€)',
-                                data: deltaJahre.map(item => item.delta.toFixed(2)),
+                                data: deltaJahre.map(item => item.delta.toFixed(2)), // Use yearly delta
                                 borderColor: 'blue',
                                 borderWidth: 2,
                                 fill: false
