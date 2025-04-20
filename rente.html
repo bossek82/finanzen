@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Rentenlücke 3</h1>
+    <h1>Rentenlücke 4</h1>
     <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
 
     <form id="rentenluecke-form">
@@ -267,8 +267,81 @@
         </script>
     </div>
 
-    <div id="berechnete-werte-waehrend-rente">
-        <h2>Berechnete Werte während der Rente</h2>
+
+    <!-- Inflation auf verbrauch aufrechnen 
+     Rentenentwicklung berechnen 
+     Monatliche Rente abziehen 
+     ...ohne Sparentnahme 
+     Delta durch Sparentnahme schließen 
+     Wertentwicklung vermögen -->
+
+
+
+    <div id="monatlicher-bedarf-ab-rente">
+        <h2>Monatlicher Bedarf ab Rente bis Tod</h2>
+        <canvas id="bedarf-ab-rente-graph" width="400" height="200"></canvas>
+        <div id="bedarf-ab-rente-ergebnisse">
+            <p id="lebensstandard-bei-tod"></p>
+        </div>
+        <script>
+            document.getElementById('berechnen-button').addEventListener('click', function () {
+                const lebensstandardBeiRente = parseFloat(document.getElementById('lebensstandard-bei-rente').textContent.match(/[\d,.]+/)[0].replace(',', '.'));
+                const inflation = parseFloat(document.getElementById('inflation').value) / 100;
+                const jahreAbRente = parseInt(document.getElementById('jahre-ab-rente').value);
+
+                const bedarfJahre = [];
+                let aktuellerBedarf = lebensstandardBeiRente;
+
+                for (let jahr = 0; jahr <= jahreAbRente; jahr++) {
+                    bedarfJahre.push({ jahr, bedarf: aktuellerBedarf });
+                    aktuellerBedarf += aktuellerBedarf * inflation;
+                }
+
+                const lebensstandardBeiTod = bedarfJahre[jahreAbRente].bedarf;
+                document.getElementById('lebensstandard-bei-tod').textContent = `Lebensstandard bei Tod: ${lebensstandardBeiTod.toFixed(2)} € (inkl. Inflation von ${(inflation * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
+
+                const ctx = document.getElementById('bedarf-ab-rente-graph').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: bedarfJahre.map(item => `Jahr ${item.jahr}`),
+                        datasets: [
+                            {
+                                label: 'Monatlicher Bedarf (€)',
+                                data: bedarfJahre.map(item => item.bedarf.toFixed(2)),
+                                borderColor: 'blue',
+                                borderWidth: 2,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Jahre ab Rente'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Betrag (€)'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
     </div>
 
     <div id="graphen-waehrend-rente">
