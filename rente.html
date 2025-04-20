@@ -5,150 +5,277 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rentenlücke</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
-            padding: 20px;
-        }
-        h1, h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        form {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        fieldset {
-            margin-bottom: 20px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-        }
-        legend {
-            font-weight: bold;
-            padding: 0 10px;
-        }
-        label {
-            font-weight: 500;
-        }
-        input {
-            margin-bottom: 10px;
-        }
-        button {
-            width: 100%;
-        }
-        .results, .graphs {
-            margin-top: 30px;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        canvas {
-            margin-top: 20px;
-        }
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            text-decoration: none;
-            color: #007bff;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Rentenlücke Berechnung</h1>
-        <p class="text-center">Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
+    <h1>Rentenlücke 3</h1>
+    <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
 
-        <form id="rentenluecke-form">
-            <fieldset>
-                <legend>Einnahmen</legend>
-                <div class="mb-3">
-                    <label for="nettoeinkommen" class="form-label">Nettoeinkommen aktuell (€):</label>
-                    <input type="number" id="nettoeinkommen" name="nettoeinkommen" class="form-control" value="5000" required>
-                </div>
-                <div class="mb-3">
-                    <label for="gehaltswachstum" class="form-label">Gehaltswachstum (% pro Jahr):</label>
-                    <input type="number" id="gehaltswachstum" name="gehaltswachstum" class="form-control" value="1.5" step="0.1" required>
-                </div>
-                <div class="mb-3">
-                    <label for="entfallende-ausgaben" class="form-label">Aktuelle Ausgaben, die in der Rente entfallen (€):</label>
-                    <input type="number" id="entfallende-ausgaben" name="entfallende-ausgaben" class="form-control" value="1200" required>
-                </div>
-            </fieldset>
+    <form id="rentenluecke-form">
+        <fieldset>
+            <legend>Einnahmen</legend>
+            <label for="nettoeinkommen">Nettoeinkommen aktuell (€):</label>
+            <input type="number" id="nettoeinkommen" name="nettoeinkommen" value="5000" required><br>
 
-            <fieldset>
-                <legend>Vermögen</legend>
-                <div class="mb-3">
-                    <label for="sparruecklage" class="form-label">Monatliche Sparrücklage (€):</label>
-                    <input type="number" id="sparruecklage" name="sparruecklage" class="form-control" value="1000" required>
-                </div>
-                <div class="mb-3">
-                    <label for="kapital" class="form-label">Vorhandenes Kapital (€):</label>
-                    <input type="number" id="kapital" name="kapital" class="form-control" value="10000" required>
-                </div>
-                <div class="mb-3">
-                    <label for="zinssatz" class="form-label">Jährlicher Zinssatz Sparvermögen (%):</label>
-                    <input type="number" id="zinssatz" name="zinssatz" class="form-control" value="6" step="0.1" required>
-                </div>
-            </fieldset>
+            <label for="gehaltswachstum">Gehaltswachstum (% pro Jahr):</label>
+            <input type="number" id="gehaltswachstum" name="gehaltswachstum" value="1.5" step="0.1" required><br>
 
-            <fieldset>
-                <legend>Rente</legend>
-                <div class="mb-3">
-                    <label for="jahre-bis-rente" class="form-label">Jahre bis zur Rente:</label>
-                    <input type="number" id="jahre-bis-rente" name="jahre-bis-rente" class="form-control" value="24" required>
-                </div>
-                <div class="mb-3">
-                    <label for="geschaetzte-rente" class="form-label">Geschätzte Rente (€):</label>
-                    <input type="number" id="geschaetzte-rente" name="geschaetzte-rente" class="form-control" value="2200" required>
-                </div>
-                <div class="mb-3">
-                    <label for="jahre-ab-rente" class="form-label">Jahre ab Rente bis zum Tod:</label>
-                    <input type="number" id="jahre-ab-rente" name="jahre-ab-rente" class="form-control" value="20" required>
-                </div>
-            </fieldset>
+            <label for="entfallende-ausgaben">Aktuelle Ausgaben, die in der Rente entfallen (€):</label>
+            <input type="number" id="entfallende-ausgaben" name="entfallende-ausgaben" value="1200" required><br>
+        </fieldset>
 
-            <div class="mb-3">
-                <label for="inflation" class="form-label">Inflation (% pro Jahr):</label>
-                <input type="number" id="inflation" name="inflation" class="form-control" value="2" step="0.1" required>
-            </div>
+        <fieldset>
+            <legend>Vermögen</legend>
+            <label for="sparruecklage">Monatliche Sparrücklage (€):</label>
+            <input type="number" id="sparruecklage" name="sparruecklage" value="1000" required><br>
 
-            <button type="button" id="berechnen-button" class="btn btn-primary">Berechnen</button>
-        </form>
+            <label for="kapital">Vorhandenes Kapital (€):</label>
+            <input type="number" id="kapital" name="kapital" value="10000" required><br>
 
-        <div id="berechnete-werte-bis-rente" class="results">
-            <h2>Berechneter monatlicher Bedarf bis Renteneintritt</h2>
-            <canvas id="nettoeinkommen-graph" width="400" height="200"></canvas>
-            <div id="berechnete-ergebnisse">
-                <p id="nettoeinkommen-am-anfang"></p>
-                <p id="nettoeinkommen-bei-rente"></p>
-                <p id="lebensstandard-am-anfang"></p>
-                <p id="lebensstandard-bei-rente"></p>
-            </div>
+            <label for="zinssatz">Jährlicher Zinssatz Sparvermögen (%):</label>
+            <input type="number" id="zinssatz" name="zinssatz" value="6" step="0.1" required><br>
+        </fieldset>
+
+        <fieldset>
+            <legend>Rente</legend>
+            <label for="jahre-bis-rente">Jahre bis zur Rente:</label>
+            <input type="number" id="jahre-bis-rente" name="jahre-bis-rente" value="24" required><br>
+
+            <label for="geschaetzte-rente">Geschätzte Rente (€):</label>
+            <input type="number" id="geschaetzte-rente" name="geschaetzte-rente" value="2200" required><br>
+
+            <label for="jahre-ab-rente">Jahre ab Rente bis zum Tod:</label>
+            <input type="number" id="jahre-ab-rente" name="jahre-ab-rente" value="20" required><br>
+        </fieldset>
+
+        <label for="inflation">Inflation (% pro Jahr):</label>
+        <input type="number" id="inflation" name="inflation" value="2" step="0.1" required><br>
+
+        <button type="button" id="berechnen-button">Berechnen</button>
+    </form>
+
+    <div id="berechnete-werte-bis-rente">
+        <h2>Berechneter monatlicher Bedarf bis Renteneintritt</h2>
+        <canvas id="nettoeinkommen-graph" width="400" height="200"></canvas>
+        <div id="berechnete-ergebnisse">
+            <p id="nettoeinkommen-am-anfang"></p>
+            <p id="nettoeinkommen-bei-rente"></p>
+            <p id="lebensstandard-am-anfang"></p>
+            <p id="lebensstandard-bei-rente"></p>
         </div>
+        <script>
+            document.getElementById('berechnen-button').addEventListener('click', function () {
+                const nettoeinkommen = parseFloat(document.getElementById('nettoeinkommen').value);
+                const gehaltswachstum = parseFloat(document.getElementById('gehaltswachstum').value) / 100;
+                const jahreBisRente = parseInt(document.getElementById('jahre-bis-rente').value);
+                const entfallendeAusgaben = parseFloat(document.getElementById('entfallende-ausgaben').value);
+                const sparruecklage = parseFloat(document.getElementById('sparruecklage').value);
 
-        <div id="graphen-bis-rente" class="graphs">
-            <h2>Berechneter Vermögensaufbau bis Renteneintritt</h2>
-            <canvas id="vermoegensaufbau-graph" width="400" height="200"></canvas>
-            <div id="vermoegensaufbau-ergebnisse">
-                <p id="vermoegen-am-anfang"></p>
-                <p id="vermoegen-bei-rente"></p>
-                <p id="netto-gespart"></p>
-                <p id="zinsvermoegen"></p>
-            </div>
-        </div>
+                const nettoeinkommenJahre = [];
+                const lebensstandardJahre = [];
+                const sparruecklageJahre = [];
+                const entfallendeAusgabenJahre = [];
+                let aktuellesEinkommen = nettoeinkommen;
 
-        <a href="index.html">Zurück zur Übersicht</a>
+                for (let jahr = 0; jahr <= jahreBisRente; jahr++) {
+                    nettoeinkommenJahre.push({ jahr, einkommen: aktuellesEinkommen });
+                    const lebensstandard = aktuellesEinkommen - entfallendeAusgaben - sparruecklage;
+                    lebensstandardJahre.push({ jahr, lebensstandard });
+                    sparruecklageJahre.push({ jahr, sparruecklage });
+                    entfallendeAusgabenJahre.push({ jahr, entfallendeAusgaben });
+                    aktuellesEinkommen += aktuellesEinkommen * gehaltswachstum;
+                }
+
+                const nettoeinkommenAmAnfang = nettoeinkommenJahre[0].einkommen;
+                document.getElementById('nettoeinkommen-am-anfang').textContent = `Nettoeinkommen am Anfang (entsprechend Eingabewert): ${nettoeinkommenAmAnfang.toFixed(2)} €`;
+
+                const nettoeinkommenBeiRente = nettoeinkommenJahre[jahreBisRente].einkommen;
+                document.getElementById('nettoeinkommen-bei-rente').textContent = `Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € (ausgehend von aktuellem Nettoeinkommen: ${nettoeinkommen.toFixed(2)} €, Gehaltswachstum: ${(gehaltswachstum * 100).toFixed(1)} % pro Jahr, über ${jahreBisRente} Jahre)`;
+
+                const lebensstandardAmAnfang = lebensstandardJahre[0].lebensstandard;
+                document.getElementById('lebensstandard-am-anfang').textContent = `Lebensstandard am Anfang: ${lebensstandardAmAnfang.toFixed(2)} € (= Nettoeinkommen: ${nettoeinkommen.toFixed(2)} € - Entfallende Ausgaben: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
+
+                const lebensstandardBeiRente = nettoeinkommenBeiRente - entfallendeAusgaben - sparruecklage;
+                document.getElementById('lebensstandard-bei-rente').textContent = `Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} € (= Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € - Entfallende Ausgaben: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
+
+                const ctx = document.getElementById('nettoeinkommen-graph').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: nettoeinkommenJahre.map(item => `Jahr ${item.jahr}`),
+                        datasets: [
+                            {
+                                label: 'Nettoeinkommen (€)',
+                                data: nettoeinkommenJahre.map(item => item.einkommen.toFixed(2)),
+                                borderColor: 'blue',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Lebensstandard (€)',
+                                data: lebensstandardJahre.map(item => item.lebensstandard.toFixed(2)),
+                                borderColor: 'green',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Sparrücklage (€)',
+                                data: sparruecklageJahre.map(item => item.sparruecklage.toFixed(2)),
+                                borderColor: 'orange',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Entfallende Ausgaben (€)',
+                                data: entfallendeAusgabenJahre.map(item => item.entfallendeAusgaben.toFixed(2)),
+                                borderColor: 'red',
+                                borderWidth: 2,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Jahre bis Rente'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Betrag (€)'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
     </div>
+
+    <div id="graphen-bis-rente">
+        <h2>Berechneter Vermögensaufbau bis Renteneintritt</h2>
+        <canvas id="vermoegensaufbau-graph" width="400" height="200"></canvas>
+        <div id="vermoegensaufbau-ergebnisse">
+            <p id="vermoegen-am-anfang"></p>
+            <p id="vermoegen-bei-rente"></p>
+            <p id="netto-gespart"></p>
+            <p id="zinsvermoegen"></p>
+        </div>
+        <script>
+            document.getElementById('berechnen-button').addEventListener('click', function () {
+                const kapital = parseFloat(document.getElementById('kapital').value);
+                const sparruecklage = parseFloat(document.getElementById('sparruecklage').value);
+                const zinssatz = parseFloat(document.getElementById('zinssatz').value) / 100;
+                const jahreBisRente = parseInt(document.getElementById('jahre-bis-rente').value);
+
+                const vermoegenJahre = [];
+                const nettoGespartJahre = [];
+                const zinsvermoegenJahre = [];
+                let aktuellesVermoegen = kapital;
+                let gesamtGespart = 0;
+                let gesamtZinsen = 0;
+
+                for (let jahr = 0; jahr <= jahreBisRente; jahr++) {
+                    vermoegenJahre.push({ jahr, vermoegen: aktuellesVermoegen });
+                    nettoGespartJahre.push({ jahr, gespart: gesamtGespart });
+                    zinsvermoegenJahre.push({ jahr, zinsen: gesamtZinsen });
+
+                    gesamtGespart += sparruecklage * 12;
+                    const zinsen = aktuellesVermoegen * zinssatz;
+                    gesamtZinsen += zinsen;
+                    aktuellesVermoegen += sparruecklage * 12 + zinsen;
+                }
+
+                const vermoegenAmAnfang = vermoegenJahre[0].vermoegen;
+                document.getElementById('vermoegen-am-anfang').textContent = `Vermögen am Anfang: ${vermoegenAmAnfang.toFixed(2)} €`;
+
+                const vermoegenBeiRente = vermoegenJahre[jahreBisRente].vermoegen;
+                document.getElementById('vermoegen-bei-rente').textContent = `Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €`;
+
+                const nettoGespart = sparruecklage * 12 * jahreBisRente;
+                document.getElementById('netto-gespart').textContent = `Netto gespart (ohne Zinsen): ${nettoGespart.toFixed(2)} €`;
+
+                const zinsvermoegen = gesamtZinsen;
+                document.getElementById('zinsvermoegen').textContent = `Zinsen erwirtschaftet: ${zinsvermoegen.toFixed(2)} €`;
+
+                const ctx = document.getElementById('vermoegensaufbau-graph').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: vermoegenJahre.map(item => `Jahr ${item.jahr}`),
+                        datasets: [
+                            {
+                                label: 'Vermögen (€)',
+                                data: vermoegenJahre.map(item => item.vermoegen.toFixed(2)),
+                                borderColor: 'purple',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Netto gespart (€)',
+                                data: nettoGespartJahre.map(item => item.gespart.toFixed(2)),
+                                borderColor: 'orange',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Zinsen (€)',
+                                data: zinsvermoegenJahre.map(item => item.zinsen.toFixed(2)),
+                                borderColor: 'green',
+                                borderWidth: 2,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Jahre bis Rente'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Betrag (€)'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+    </div>
+
+    <div id="berechnete-werte-waehrend-rente">
+        <h2>Berechnete Werte während der Rente</h2>
+    </div>
+
+    <div id="graphen-waehrend-rente">
+        <h2>Graphen während der Rente</h2>
+    </div>
+
+    <div id="graphen"></div>
+
+    <a href="index.html">Zurück zur Übersicht</a>
 </body>
 </html>
