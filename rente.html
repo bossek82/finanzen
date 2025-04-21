@@ -55,6 +55,29 @@
         <input type="number" id="inflation" name="inflation" value="2" step="0.1" required><br>
 
         <button type="button" id="berechnen-button">Berechnen</button>
+        <script>
+            document.getElementById('berechnen-button').onclick = function () {
+            // Reset all result fields before calculation
+            document.getElementById('nettoeinkommen-am-anfang').textContent = '';
+            document.getElementById('nettoeinkommen-bei-rente').textContent = '';
+            document.getElementById('lebensstandard-am-anfang').textContent = '';
+            document.getElementById('lebensstandard-bei-rente').textContent = '';
+            document.getElementById('vermoegen-am-anfang').textContent = '';
+            document.getElementById('vermoegen-bei-rente').textContent = '';
+            document.getElementById('netto-gespart').textContent = '';
+            document.getElementById('zinsvermoegen').textContent = '';
+            document.getElementById('lebensstandard-bei-tod').textContent = '';
+            document.getElementById('rente-bei-tod').textContent = '';
+            document.getElementById('delta-bei-tod').textContent = '';
+            document.getElementById('vermoegen-bei-tod').textContent = '';
+            document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = '';
+            document.getElementById('entnommenes-vermoegen').textContent = '';
+            document.getElementById('delta-pro-jahr').textContent = '';
+
+            // Trigger recalculation and update results
+            // Removed recursive event dispatch to prevent infinite loop
+            };
+        </script>
     </form>
 
     <div id="berechnete-werte-bis-rente">
