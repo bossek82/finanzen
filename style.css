@@ -120,7 +120,6 @@ table th {
 
     canvas {
         width: 100%;
-        height: 600px; /* Default height added */
         margin: 0;
     }
 
