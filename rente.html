@@ -10,9 +10,9 @@
 <body>
     <div id="rentenluecke-header">
         <h1>Rentensituation berechnen</h1>
-        <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
     </div>
-
+    
+    
     <form id="rentenluecke-form">
         <fieldset>
             <legend>Einnahmen</legend>
@@ -124,7 +124,7 @@
                 document.getElementById('nettoeinkommen-am-anfang').textContent = `Nettoeinkommen aktuell: ${nettoeinkommenAmAnfang.toFixed(2)} €`;
 
                 const nettoeinkommenBeiRente = nettoeinkommenJahre[jahreBisRente].einkommen;
-                document.getElementById('nettoeinkommen-bei-rente').textContent = `voraussichtliches Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € (aktuelles Nettoeinkommen: ${nettoeinkommen.toFixed(2)} €, jährliches Gehaltswachstum: ${(gehaltswachstum * 100).toFixed(1)} % über ${jahreBisRente} Jahre).`;
+                document.getElementById('nettoeinkommen-bei-rente').textContent = `Voraussichtliches Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € (aktuelles Nettoeinkommen: ${nettoeinkommen.toFixed(2)} €, jährliches Gehaltswachstum: ${(gehaltswachstum * 100).toFixed(1)} % über ${jahreBisRente} Jahre).`;
 
                 const lebensstandardAmAnfang = lebensstandardJahre[0].lebensstandard;
                 document.getElementById('lebensstandard-am-anfang').textContent = `Lebensstandard aktuell abzgl. wegfallender Ausgaben: ${lebensstandardAmAnfang.toFixed(2)} € (= Nettoeinkommen: ${nettoeinkommen.toFixed(2)} € - Entfallende Ausgaben in Rente: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
@@ -166,7 +166,7 @@
                                 fill: false
                             },
                             {
-                                label: 'Entfallende Ausgaben (€)',
+                                label: 'Entfallende Ausgaben ab Renteneintritt (€)',
                                 data: entfallendeAusgabenJahre.map(item => item.entfallendeAusgaben.toFixed(2)),
                                 borderColor: 'black',
                                 borderWidth: 2,
@@ -246,13 +246,14 @@
                 document.getElementById('vermoegen-am-anfang').textContent = `Vermögen aktuell: ${vermoegenAmAnfang.toFixed(2)} €`;
 
                 const vermoegenBeiRente = vermoegenJahre[jahreBisRente].vermoegen;
-                document.getElementById('vermoegen-bei-rente').textContent = `voraussichtliches Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €`;
+                globalVermoegenBeiRente = vermoegenBeiRente;
+                document.getElementById('vermoegen-bei-rente').textContent = `Voraussichtliches Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € (Startkapital: ${kapital.toFixed(2)} €, monatliche Sparrücklage: ${sparruecklage.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %, über ${jahreBisRente} Jahre)`;
 
                 const nettoGespart = sparruecklage * 12 * jahreBisRente;
-                document.getElementById('netto-gespart').textContent = `Gespartes Vermögen (ohne Zinsen): ${nettoGespart.toFixed(2)} €`;
+                document.getElementById('netto-gespart').textContent = `Gespartes Vermögen (ohne Zinsen): ${nettoGespart.toFixed(2)} € (monatliche Sparrücklage: ${sparruecklage.toFixed(2)} €, über ${jahreBisRente} Jahre)`;
 
                 const zinsvermoegen = gesamtZinsen;
-                document.getElementById('zinsvermoegen').textContent = `Zusätzliches Vermögen durch Zinsen: ${zinsvermoegen.toFixed(2)} €`;
+                document.getElementById('zinsvermoegen').textContent = `Zusätzliches Vermögen durch Zinsen: ${zinsvermoegen.toFixed(2)} € (berechnet als Summe der jährlichen Zinsen über ${jahreBisRente} Jahre, basierend auf dem jährlichen Zinssatz von ${(zinssatz * 100).toFixed(1)} % und dem Vermögen im jeweiligen Jahr).`;
 
                 const ctx = document.getElementById('vermoegensaufbau-graph').getContext('2d');
                 // Destroy existing chart instance if it exists before creating a new one
@@ -391,7 +392,7 @@
                         labels: bedarfJahre.map(item => `Jahr ${item.jahr}`),
                         datasets: [
                             {
-                                label: 'Lebensstandard (€)',
+                                label: 'Lebensstandard ab Renteneintritt (€)',
                                 data: bedarfJahre.map(item => item.bedarf),
                                 borderColor: 'orange',
                                 borderWidth: 2,
@@ -405,7 +406,7 @@
                                 fill: false
                             },
                             {
-                                label: 'Delta (Bedarf - Rente) (€)',
+                                label: 'Delta (= Lebensstandard - Rente) (€)',
                                 data: deltaJahre.map(item => item.delta),
                                 borderColor: 'red',
                                 borderWidth: 2,
@@ -459,13 +460,21 @@
         </div>
         <script>
             document.getElementById('berechnen-button').addEventListener('click', function () {
-                const vermoegenBeiRente = parseFloat(document.getElementById('vermoegen-bei-rente').textContent.match(/[\d,.]+/)[0].replace(',', '.'));
+                const vermoegenBeiRente = globalVermoegenBeiRente;
                 const lebensstandardBeiRente = globalLebensStandardbeiRente;
                 const geschaetzteRente = parseFloat(document.getElementById('geschaetzte-rente').value);
                 const rentenentwicklung = parseFloat(document.getElementById('rentenentwicklung').value) / 100;
                 const inflation = parseFloat(document.getElementById('inflation').value) / 100;
                 const zinssatz = parseFloat(document.getElementById('zinssatz').value) / 100;
                 const jahreAbRente = parseInt(document.getElementById('jahre-ab-rente').value);
+
+                console.log('Vermögen bei Rente:', vermoegenBeiRente);
+                console.log('Lebensstandard bei Rente:', lebensstandardBeiRente);
+                console.log('Geschätzte Rente:', geschaetzteRente);
+                console.log('Rentenentwicklung (%):', rentenentwicklung * 100);
+                console.log('Inflation (%):', inflation * 100);
+                console.log('Zinssatz (%):', zinssatz * 100);
+                console.log('Jahre ab Rente:', jahreAbRente);
                 
                 const vermoegenJahre = [];
                 const vermoegenOhneEntnahmeJahre = [];
@@ -479,6 +488,7 @@
 
                 for (let jahr = 0; jahr <= jahreAbRente; jahr++) {
                     const delta = aktuellerBedarf - aktuelleRente;
+                    console.log('delta:', delta);
                     const entnommen = delta * 12;
                     gesamtEntnommen += entnommen;
                     const aktuellesVermoegen_neu = aktuellesVermoegen - entnommen + (aktuellesVermoegen * zinssatz);
@@ -490,19 +500,15 @@
                     entnommenesVermoegenJahre.push({ jahr, entnommen: gesamtEntnommen });
                     deltaJahre.push({ jahr, delta: delta * 12 });
 
-                    const aktuellerBedarf_neu = aktuellerBedarf * inflation;
-                    aktuellerBedarf = aktuellerBedarf_neu;
-                    
-                    const aktuelleRente_neu = aktuelleRente * rentenentwicklung;
-                    aktuelleRente = aktuelleRente_neu;
+                    aktuellerBedarf += aktuellerBedarf * inflation;
+                    aktuelleRente += aktuelleRente * rentenentwicklung;
                 }
 
                 document.getElementById('vermoegen-am-anfang-rente').textContent = `Vermögen zu Beginn: ${vermoegenJahre[0].vermoegen.toFixed(2)} €`;
                 document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod mit Entnahme: ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} €`;
                 document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegenohne.toFixed(2)} €`;
                 document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommen.toFixed(2)} €`;
-                document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr: ${deltaJahre.map(item => `Jahr ${item.jahr}: ${item.delta.toFixed(2)} €`).join(', ')}`;
-
+                
                 const ctx = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
                 if (window.vermoegensentwicklungChart) {
                     window.vermoegensentwicklungChart.destroy();
