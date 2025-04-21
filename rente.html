@@ -15,7 +15,7 @@
     
     <form id="rentenluecke-form">
         <fieldset>
-            <legend>Einnahmen</legend>
+            <legend>Aktuelle Einnahmen/Ausgaben</legend>
             <label for="nettoeinkommen">Nettoeinkommen aktuell (€):</label>
             <input type="number" id="nettoeinkommen" name="nettoeinkommen" value="2500" step="100" required><br>
 
@@ -27,7 +27,7 @@
         </fieldset>
 
         <fieldset>
-            <legend>Vermögen</legend>
+            <legend>Vermögen und Vermögensaufbau</legend>
             <label for="sparruecklage">Monatliche Sparrücklage (€):</label>
             <input type="number" id="sparruecklage" name="sparruecklage" value="100" step="50" required><br>
 
@@ -38,7 +38,7 @@
             <input type="number" id="zinssatz" name="zinssatz" value="6" step="0.1" required><br>
         </fieldset>
         <fieldset>
-            <legend>Rente</legend>
+            <legend>Renteinformationen</legend>
             <label for="jahre-bis-rente">Jahre bis zur Rente:</label>
             <input type="number" id="jahre-bis-rente" name="jahre-bis-rente" value="25" step="1" required><br>
 
@@ -54,7 +54,7 @@
         </fieldset>
 
         <label for="inflation">Jährliche Inflation (%):</label>
-        <input type="number" id="inflation" name="inflation" value="2,5" step="0.1" required><br>
+        <input type="number" id="inflation" name="inflation" value="2" step="0.1" required><br>
 
         <button type="button" id="berechnen-button">Berechnen</button>
         <script>
