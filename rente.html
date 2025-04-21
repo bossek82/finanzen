@@ -319,9 +319,6 @@
 
 
 
-
-
-
     <div id="monatlicher-bedarf-ab-rente">
         <h2>Monatlicher Bedarf und Rentenlücke ab Renteneintritt bis Tod</h2>
         <canvas id="bedarf-und-rente-ab-rente-graph" width="400" height="200"></canvas>
@@ -344,6 +341,7 @@
 
                 const nettoeinkommenBeiRente = nettoeinkommen * Math.pow(1 + gehaltswachstum, jahreBisRente);
                 const lebensstandardBeiRente = nettoeinkommenBeiRente - entfallendeAusgaben - sparruecklage;
+                globalLebensStandardbeiRente = lebensstandardBeiRente;
                 const geschaetzteRente = parseFloat(document.getElementById('geschaetzte-rente').value);
                 const rentenentwicklung = parseFloat(document.getElementById('rentenentwicklung').value) / 100;
                 const inflation = parseFloat(document.getElementById('inflation').value) / 100;
@@ -461,13 +459,13 @@
         <script>
             document.getElementById('berechnen-button').addEventListener('click', function () {
                 const vermoegenBeiRente = parseFloat(document.getElementById('vermoegen-bei-rente').textContent.match(/[\d,.]+/)[0].replace(',', '.'));
-                const lebensstandardBeiRente = parseFloat(document.getElementById('lebensstandard-bei-rente').textContent.match(/[\d,.]+/)[0].replace(',', '.'));
+                const lebensstandardBeiRente = globalLebensStandardbeiRente;
                 const geschaetzteRente = parseFloat(document.getElementById('geschaetzte-rente').value);
                 const rentenentwicklung = parseFloat(document.getElementById('rentenentwicklung').value) / 100;
                 const inflation = parseFloat(document.getElementById('inflation').value) / 100;
                 const zinssatz = parseFloat(document.getElementById('zinssatz').value) / 100;
                 const jahreAbRente = parseInt(document.getElementById('jahre-ab-rente').value);
-
+                
                 const vermoegenJahre = [];
                 const vermoegenOhneEntnahmeJahre = [];
                 const entnommenesVermoegenJahre = [];
@@ -569,7 +567,8 @@
         </script>
     </div>
 
-
-    <a href="index.html">Zurück zur Übersicht</a>
+    <div>
+        <a href="index.html">Zurück zur Übersicht</a>
+    </div>
 </body>
 </html>
