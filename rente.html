@@ -121,16 +121,16 @@
                 }
 
                 const nettoeinkommenAmAnfang = nettoeinkommenJahre[0].einkommen;
-                document.getElementById('nettoeinkommen-am-anfang').textContent = `Nettoeinkommen aktuell: ${nettoeinkommenAmAnfang.toFixed(2)} €`;
+                document.getElementById('nettoeinkommen-am-anfang').innerHTML = `<strong>Nettoeinkommen aktuell: ${nettoeinkommenAmAnfang.toFixed(2)} €</strong>`;
 
                 const nettoeinkommenBeiRente = nettoeinkommenJahre[jahreBisRente].einkommen;
-                document.getElementById('nettoeinkommen-bei-rente').textContent = `Voraussichtliches Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € (aktuelles Nettoeinkommen: ${nettoeinkommen.toFixed(2)} €, jährliches Gehaltswachstum: ${(gehaltswachstum * 100).toFixed(1)} % über ${jahreBisRente} Jahre).`;
+                document.getElementById('nettoeinkommen-bei-rente').innerHTML = `<strong>Voraussichtliches Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} €</strong><br>= Nettoeinkommen: ${nettoeinkommen.toFixed(2)} € mit jährlichem Gehaltswachstum: ${(gehaltswachstum * 100).toFixed(1)} % über ${jahreBisRente} Jahre`;
 
                 const lebensstandardAmAnfang = lebensstandardJahre[0].lebensstandard;
-                document.getElementById('lebensstandard-am-anfang').textContent = `Lebensstandard aktuell abzgl. wegfallender Ausgaben: ${lebensstandardAmAnfang.toFixed(2)} € (= Nettoeinkommen: ${nettoeinkommen.toFixed(2)} € - Entfallende Ausgaben in Rente: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
+                document.getElementById('lebensstandard-am-anfang').innerHTML = `<strong>Lebensstandard aktuell abzgl. wegfallender Ausgaben: ${lebensstandardAmAnfang.toFixed(2)} €</strong><br>= Nettoeinkommen: ${nettoeinkommen.toFixed(2)} € - Entfallende Ausgaben in Rente: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €`;
 
                 const lebensstandardBeiRente = nettoeinkommenBeiRente - entfallendeAusgaben - sparruecklage;
-                document.getElementById('lebensstandard-bei-rente').textContent = `Voraussichtlicher Lebensstandard bei Renteneintritt abzgl. wegfallender Ausgaben: ${lebensstandardBeiRente.toFixed(2)} € (= Nettoeinkommen: ${nettoeinkommenBeiRente.toFixed(2)} € - Entfallende Ausgaben in Rente: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
+                document.getElementById('lebensstandard-bei-rente').innerHTML = `<strong>Voraussichtlicher Lebensstandard bei Renteneintritt abzgl. wegfallender Ausgaben: ${lebensstandardBeiRente.toFixed(2)} €</strong><br>= Nettoeinkommen: ${nettoeinkommenBeiRente.toFixed(2)} € - Entfallende Ausgaben in Rente: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €`;
 
                 const ctx = document.getElementById('nettoeinkommen-graph').getContext('2d');
                 // Destroy existing chart instance if it exists before creating a new one
@@ -243,17 +243,17 @@
                 }
 
                 const vermoegenAmAnfang = vermoegenJahre[0].vermoegen;
-                document.getElementById('vermoegen-am-anfang').textContent = `Vermögen aktuell: ${vermoegenAmAnfang.toFixed(2)} €`;
+                document.getElementById('vermoegen-am-anfang').innerHTML = `<strong>Vermögen aktuell: ${vermoegenAmAnfang.toFixed(2)} €</strong>`;
 
                 const vermoegenBeiRente = vermoegenJahre[jahreBisRente].vermoegen;
                 globalVermoegenBeiRente = vermoegenBeiRente;
-                document.getElementById('vermoegen-bei-rente').textContent = `Voraussichtliches Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € (Startkapital: ${kapital.toFixed(2)} €, monatliche Sparrücklage: ${sparruecklage.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %, über ${jahreBisRente} Jahre)`;
+                document.getElementById('vermoegen-bei-rente').innerHTML = `<strong>Voraussichtliches Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €</strong><br>= Startkapital: ${kapital.toFixed(2)} € + monatliche Sparrücklage: ${sparruecklage.toFixed(2)} € * jährlichem Zinssatz: ${(zinssatz * 100).toFixed(1)} % über ${jahreBisRente} Jahre`;
 
                 const nettoGespart = sparruecklage * 12 * jahreBisRente;
-                document.getElementById('netto-gespart').textContent = `Gespartes Vermögen (ohne Zinsen): ${nettoGespart.toFixed(2)} € (monatliche Sparrücklage: ${sparruecklage.toFixed(2)} €, über ${jahreBisRente} Jahre)`;
+                document.getElementById('netto-gespart').innerHTML = `<strong>Gespartes Vermögen (ohne Zinsen): ${nettoGespart.toFixed(2)} €</strong><br>= monatliche Sparrücklage: ${sparruecklage.toFixed(2)} € über ${jahreBisRente} Jahre`;
 
                 const zinsvermoegen = gesamtZinsen;
-                document.getElementById('zinsvermoegen').textContent = `Zusätzliches Vermögen durch Zinsen: ${zinsvermoegen.toFixed(2)} € (berechnet als Summe der jährlichen Zinsen über ${jahreBisRente} Jahre, basierend auf dem jährlichen Zinssatz von ${(zinssatz * 100).toFixed(1)} % und dem Vermögen im jeweiligen Jahr).`;
+                document.getElementById('zinsvermoegen').innerHTML = `<strong>Zusätzliches Vermögen durch Zinsen: ${zinsvermoegen.toFixed(2)} €</strong><br>= Summe der jährlichen Zinsen über ${jahreBisRente} Jahre, basierend auf dem jährlichen Zinssatz von ${(zinssatz * 100).toFixed(1)} % und dem Vermögen im jeweiligen Jahr`;
 
                 const ctx = document.getElementById('vermoegensaufbau-graph').getContext('2d');
                 // Destroy existing chart instance if it exists before creating a new one
@@ -363,21 +363,21 @@
                     aktuelleRente += aktuelleRente * rentenentwicklung;
                 }
                 
-                document.getElementById('lebensstandard-ab-rente').textContent = `Voraussichtlicher Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} € (Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} €, Entfallende Ausgaben: ${entfallendeAusgaben.toFixed(2)} €, Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
+                document.getElementById('lebensstandard-ab-rente').innerHTML = `<strong>Voraussichtlicher Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} €</strong><br>= Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € - entfallende Ausgaben: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €`;
 
                 const lebensstandardBeiTod = bedarfJahre[jahreAbRente].bedarf;
-                document.getElementById('lebensstandard-bei-tod').textContent = `Voraussichtlicher Lebensstandard bei Tod: ${lebensstandardBeiTod.toFixed(2)} € (ausgehend vom Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} €, inkl. Inflation von ${(inflation * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
+                document.getElementById('lebensstandard-bei-tod').innerHTML = `<strong>Voraussichtlicher Lebensstandard bei Tod: ${lebensstandardBeiTod.toFixed(2)} €</strong><br>= Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} € * Inflation von ${(inflation * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre`;
 
-                document.getElementById('geschaetzte-rente-ab-rente').textContent = `Geschätzte Rente bei Renteneintritt: ${geschaetzteRente.toFixed(2)} €`;
+                document.getElementById('geschaetzte-rente-ab-rente').innerHTML = `<strong>Geschätzte Rente bei Renteneintritt: ${geschaetzteRente.toFixed(2)} €</strong>`;
 
                 const renteBeiTod = renteJahre[jahreAbRente].rente;
-                document.getElementById('rente-bei-tod').textContent = `Voraussichtliche Rente bei Tod: ${renteBeiTod.toFixed(2)} € (inkl. Rentenentwicklung von ${(rentenentwicklung * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
+                document.getElementById('rente-bei-tod').innerHTML = `<strong>Voraussichtliche Rente bei Tod: ${renteBeiTod.toFixed(2)} €</strong><br>= Rentenentwicklung von ${(rentenentwicklung * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre`;
                 
                 const deltaAmAnfang = lebensstandardBeiRente - geschaetzteRente;
-                document.getElementById('delta-am-anfang-rente').textContent = `Rentenlücke zu Beginn der Rente: ${deltaAmAnfang.toFixed(2)} € (Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} € - Geschätzte Rente: ${geschaetzteRente.toFixed(2)} €)`;
+                document.getElementById('delta-am-anfang-rente').innerHTML = `<strong>Rentenlücke zu Beginn der Rente: ${deltaAmAnfang.toFixed(2)} €</strong><br>= Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} € - Geschätzte Rente: ${geschaetzteRente.toFixed(2)} €`;
                                 
                 const deltaBeiTod = deltaJahre[jahreAbRente].delta;
-                document.getElementById('delta-bei-tod').textContent = `Rentenlücke bei Tod: ${deltaBeiTod.toFixed(2)} € (Lebensstandard bei Tod: ${lebensstandardBeiTod.toFixed(2)} € - Rente bei Tod: ${renteBeiTod.toFixed(2)} €)`;
+                document.getElementById('delta-bei-tod').innerHTML = `<strong>Rentenlücke bei Tod: ${deltaBeiTod.toFixed(2)} €</strong><br>= Lebensstandard bei Tod: ${lebensstandardBeiTod.toFixed(2)} € - Rente bei Tod: ${renteBeiTod.toFixed(2)} €`;
 
                 const ctx = document.getElementById('bedarf-und-rente-ab-rente-graph').getContext('2d');
                 // Destroy existing chart instance if it exists before creating a new one
@@ -504,13 +504,13 @@
                     aktuelleRente += aktuelleRente * rentenentwicklung;
                 }
 
-                document.getElementById('vermoegen-am-anfang-rente').textContent = `Vermögen zu Beginn: ${vermoegenJahre[0].vermoegen.toFixed(2)} € (Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %)`;
+                document.getElementById('vermoegen-am-anfang-rente').innerHTML = `<strong>Vermögen bei Renteneintritt: ${vermoegenJahre[0].vermoegen.toFixed(2)} €</strong>`;
                 
-                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod mit Entnahme: ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} € (Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € - jährlich entnommenes Vermögen + Zinsen auf verbleibendes Vermögen über ${jahreAbRente} Jahre mit einem Zinssatz von ${(zinssatz * 100).toFixed(1)} %).`;
+                document.getElementById('vermoegen-bei-tod').innerHTML = `<strong>Vermögen bei Tod mit Entnahme: ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} €</strong><br>= Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € - jährlich entnommenes Vermögen + Zinsen auf verbleibendes Vermögen über ${jahreAbRente} Jahre mit einem Zinssatz von ${(zinssatz * 100).toFixed(1)} %`;
                 
-                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegenohne.toFixed(2)} € (Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € + jährliche Zinsen von ${(zinssatz * 100).toFixed(1)} % über ${jahreAbRente} Jahre, ohne Entnahmen).`;
+                document.getElementById('vermoegen-ohne-entnahme-bei-tod').innerHTML = `<strong>Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegenohne.toFixed(2)} €</strong><br>= Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € * jährliche Zinsen von ${(zinssatz * 100).toFixed(1)} % über ${jahreAbRente} Jahre, ohne Entnahmen`;
                 
-                document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommen.toFixed(2)} € (Summe der jährlichen Entnahmen über ${jahreAbRente} Jahre, basierend auf dem jährlichen Delta zwischen Lebensstandard und geschätzter Rente).`;
+                document.getElementById('entnommenes-vermoegen').innerHTML = `<strong>Bis zum Tod entnommenes Vermögen: ${gesamtEntnommen.toFixed(2)} €</strong><br>= Summe der jährlichen Entnahmen über ${jahreAbRente} Jahre, basierend auf dem jährlichen Delta zwischen Lebensstandard und geschätzter Rente`;
                 
                 const ctx = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
                 if (window.vermoegensentwicklungChart) {
