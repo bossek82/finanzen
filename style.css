@@ -93,6 +93,15 @@ table th {
         padding: 1rem;
     }
 
+    .output {
+        font-size: 0.9rem;
+    }
+
+    button {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
     h1, h2, h3, h4 {
         font-size: 1.5rem;
     }
