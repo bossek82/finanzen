@@ -100,6 +100,9 @@ table th {
     form {
         width: 100%;
     }
+    div {
+        width: 100%;
+    }
 
     input, button {
         width: 100%;
