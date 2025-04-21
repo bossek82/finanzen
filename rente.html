@@ -374,10 +374,10 @@
                 document.getElementById('rente-bei-tod').textContent = `Voraussichtliche Rente bei Tod: ${renteBeiTod.toFixed(2)} € (inkl. Rentenentwicklung von ${(rentenentwicklung * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
                 
                 const deltaAmAnfang = lebensstandardBeiRente - geschaetzteRente;
-                document.getElementById('delta-am-anfang-rente').textContent = `Rentenlücke zu Beginn der Rente (= Lebensstandard - Rente): ${deltaAmAnfang.toFixed(2)} €`;
+                document.getElementById('delta-am-anfang-rente').textContent = `Rentenlücke zu Beginn der Rente: ${deltaAmAnfang.toFixed(2)} € (Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} € - Geschätzte Rente: ${geschaetzteRente.toFixed(2)} €)`;
                                 
                 const deltaBeiTod = deltaJahre[jahreAbRente].delta;
-                document.getElementById('delta-bei-tod').textContent = `Rentenlücke bei Tod (= Lebensstandard - Rente): ${deltaBeiTod.toFixed(2)} €`;
+                document.getElementById('delta-bei-tod').textContent = `Rentenlücke bei Tod: ${deltaBeiTod.toFixed(2)} € (Lebensstandard bei Tod: ${lebensstandardBeiTod.toFixed(2)} € - Rente bei Tod: ${renteBeiTod.toFixed(2)} €)`;
 
                 const ctx = document.getElementById('bedarf-und-rente-ab-rente-graph').getContext('2d');
                 // Destroy existing chart instance if it exists before creating a new one
@@ -426,7 +426,7 @@
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Jahre ab Rente'
+                                    text: 'Jahre bis zum Tod'
                                 }
                             },
                             y: {
@@ -504,10 +504,13 @@
                     aktuelleRente += aktuelleRente * rentenentwicklung;
                 }
 
-                document.getElementById('vermoegen-am-anfang-rente').textContent = `Vermögen zu Beginn: ${vermoegenJahre[0].vermoegen.toFixed(2)} €`;
-                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod mit Entnahme: ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} €`;
-                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegenohne.toFixed(2)} €`;
-                document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommen.toFixed(2)} €`;
+                document.getElementById('vermoegen-am-anfang-rente').textContent = `Vermögen zu Beginn: ${vermoegenJahre[0].vermoegen.toFixed(2)} € (Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %)`;
+                
+                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod mit Entnahme: ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} € (Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € - jährlich entnommenes Vermögen + Zinsen auf verbleibendes Vermögen über ${jahreAbRente} Jahre mit einem Zinssatz von ${(zinssatz * 100).toFixed(1)} %).`;
+                
+                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegenohne.toFixed(2)} € (Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € + jährliche Zinsen von ${(zinssatz * 100).toFixed(1)} % über ${jahreAbRente} Jahre, ohne Entnahmen).`;
+                
+                document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommen.toFixed(2)} € (Summe der jährlichen Entnahmen über ${jahreAbRente} Jahre, basierend auf dem jährlichen Delta zwischen Lebensstandard und geschätzter Rente).`;
                 
                 const ctx = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
                 if (window.vermoegensentwicklungChart) {
@@ -534,14 +537,14 @@
                                 fill: false
                             },
                             {
-                                label: 'Entnommenes Vermögen (€)',
+                                label: 'Entnommenes Vermögen insgesamt (€)',
                                 data: entnommenesVermoegenJahre.map(item => item.entnommen.toFixed(2)),
                                 borderColor: 'orange',
                                 borderWidth: 2,
                                 fill: false
                             },
                             {
-                                label: 'Delta (Bedarf - Rente) (€)',
+                                label: 'Entnahme pro Jahr (€)',
                                 data: deltaJahre.map(item => item.delta.toFixed(2)),
                                 borderColor: 'red',
                                 borderWidth: 2,
@@ -561,7 +564,7 @@
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Jahre ab Rente'
+                                    text: 'Jahre bis zum Tod'
                                 }
                             },
                             y: {
