@@ -68,8 +68,11 @@
             document.getElementById('vermoegen-bei-rente').textContent = '';
             document.getElementById('netto-gespart').textContent = '';
             document.getElementById('zinsvermoegen').textContent = '';
+            document.getElementById('lebensstandard-ab-rente').textContent = '';
+            document.getElementById('geschaetzte-rente-ab-rente').textContent = '';
             document.getElementById('lebensstandard-bei-tod').textContent = '';
             document.getElementById('rente-bei-tod').textContent = '';
+            document.getElementById('delta-am-anfang-rente').textContent = '';
             document.getElementById('delta-bei-tod').textContent = '';
             document.getElementById('vermoegen-bei-tod').textContent = '';
             document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = '';
@@ -80,6 +83,10 @@
         </script>
     </form>
 
+
+
+
+    
     <div id="berechnete-werte-bis-rente">
         <h2>Monatlicher Bedarf bis Renteneintritt</h2>
         <canvas id="nettoeinkommen-graph" width="400" height="200"></canvas>
@@ -195,6 +202,11 @@
         </script>
     </div>
 
+
+
+
+
+
     <div id="graphen-bis-rente">
         <h2>Vermögensaufbau bis Renteneintritt</h2>
         <canvas id="vermoegensaufbau-graph" width="400" height="200"></canvas>
@@ -256,21 +268,21 @@
                             {
                                 label: 'Vermögen (€)',
                                 data: vermoegenJahre.map(item => item.vermoegen.toFixed(2)),
-                                borderColor: 'purple',
+                                borderColor: 'blue',
                                 borderWidth: 2,
                                 fill: false
                             },
                             {
                                 label: 'Netto gespart (€)',
                                 data: nettoGespartJahre.map(item => item.gespart.toFixed(2)),
-                                borderColor: 'orange',
+                                borderColor: 'green',
                                 borderWidth: 2,
                                 fill: false
                             },
                             {
                                 label: 'Zinsen (€)',
                                 data: zinsvermoegenJahre.map(item => item.zinsen.toFixed(2)),
-                                borderColor: 'green',
+                                borderColor: 'purple',
                                 borderWidth: 2,
                                 fill: false
                             }
@@ -304,6 +316,11 @@
             });
         </script>
     </div>
+
+
+
+
+
 
     <div id="monatlicher-bedarf-ab-rente">
         <h2>Monatlicher Bedarf und Rentenlücke ab Renteneintritt bis Tod</h2>
@@ -425,10 +442,17 @@
                 
             });
         </script>
+    </div>
+    
+
+
+
+
     <div id="vermoegensentwicklung-ab-rente">
         <h2>Vermögensentwicklung ab Renteneintritt bis Tod</h2>
         <canvas id="vermoegensentwicklung-ab-rente-graph" width="400" height="200"></canvas>
         <div id="vermoegensentwicklung-ab-rente-ergebnisse">
+            <p id="vermoegen-am-anfang"></p>
             <p id="vermoegen-bei-tod"></p>
             <p id="vermoegen-ohne-entnahme-bei-tod"></p>
             <p id="entnommenes-vermoegen"></p>
@@ -456,38 +480,31 @@
 
                 for (let jahr = 0; jahr <= jahreAbRente; jahr++) {
                     const delta = aktuellerBedarf - aktuelleRente;
-                    const entnommen = delta * 12; // Yearly delta
+                    const entnommen = delta * 12;
                     gesamtEntnommen += entnommen;
-                    aktuellesVermoegen -= entnommen; // Subtract yearly delta
-                    aktuellesVermoegen += aktuellesVermoegen * zinssatz; // Add interest
-                    vermoegenOhneEntnahme += vermoegenOhneEntnahme * zinssatz; // Add interest without withdrawal
+                    aktuellesVermoegen = aktuellesVermoegen - entnommen + (aktuellesVermoegen * zinssatz);
+                    vermoegenOhneEntnahme += vermoegenOhneEntnahme * zinssatz;
+
                     vermoegenJahre.push({ jahr, vermoegen: aktuellesVermoegen });
                     vermoegenOhneEntnahmeJahre.push({ jahr, vermoegen: vermoegenOhneEntnahme });
                     entnommenesVermoegenJahre.push({ jahr, entnommen: gesamtEntnommen });
-                    deltaJahre.push({ jahr, delta: delta * 12 }); // Store yearly delta
+                    deltaJahre.push({ jahr, delta: delta * 12 });
 
                     aktuellerBedarf += aktuellerBedarf * inflation;
                     aktuelleRente += aktuelleRente * rentenentwicklung;
                 }
 
-                const vermoegenBeiTod = vermoegenJahre[jahreAbRente].vermoegen;
-                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod bei Entnahme: ${vermoegenBeiTod.toFixed(2)} € (berechnet aus Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %, unter Berücksichtigung der jährlichen Entnahmen).`;
-
-                const vermoegenOhneEntnahmeBeiTod = vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegen;
-                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeBeiTod.toFixed(2)} € (berechnet aus Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €, jährlicher Zinssatz: ${(zinssatz * 100).toFixed(1)} %, ohne Berücksichtigung von Entnahmen).`;
-
-                const gesamtEntnommenesVermoegen = gesamtEntnommen;
-                document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommenesVermoegen.toFixed(2)} € (berechnet aus jährlichem Delta zwischen Bedarf und Rente, multipliziert mit 12 Monaten, über ${jahreAbRente} Jahre).`;
-                const deltaProJahr = deltaJahre.map(item => `Jahr ${item.jahr}: ${item.delta.toFixed(2)} €`).join(', ');
-                document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr (hochgerechnet): ${deltaProJahr} (berechnet aus dem jährlichen Delta zwischen Bedarf und geschätzter Rente).`;
+                document.getElementById('vermoegen-am-anfang').textContent = `Vermögen zu Beginn: ${vermoegenJahre[0].vermoegen.toFixed(2)} €`;
+                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod (mit Entnahme): ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} €`;
+                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod (ohne Entnahme): ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegen.toFixed(2)} €`;
+                document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommen.toFixed(2)} €`;
+                document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr: ${deltaJahre.map(item => `Jahr ${item.jahr}: ${item.delta.toFixed(2)} €`).join(', ')}`;
 
                 const ctx = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
-                // Destroy existing chart instance if it exists before creating a new one
                 if (window.vermoegensentwicklungChart) {
                     window.vermoegensentwicklungChart.destroy();
                 }
 
-                // Create a new chart instance and store it in a global variable
                 window.vermoegensentwicklungChart = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -496,7 +513,7 @@
                             {
                                 label: 'Vermögen (€)',
                                 data: vermoegenJahre.map(item => item.vermoegen.toFixed(2)),
-                                borderColor: 'purple',
+                                borderColor: 'blue',
                                 borderWidth: 2,
                                 fill: false
                             },
@@ -510,14 +527,14 @@
                             {
                                 label: 'Entnommenes Vermögen (€)',
                                 data: entnommenesVermoegenJahre.map(item => item.entnommen.toFixed(2)),
-                                borderColor: 'red',
+                                borderColor: 'orange',
                                 borderWidth: 2,
                                 fill: false
                             },
                             {
                                 label: 'Delta (Bedarf - Rente) (€)',
-                                data: deltaJahre.map(item => item.delta.toFixed(2)), // Use yearly delta
-                                borderColor: 'blue',
+                                data: deltaJahre.map(item => item.delta.toFixed(2)),
+                                borderColor: 'red',
                                 borderWidth: 2,
                                 fill: false
                             }
@@ -548,12 +565,10 @@
                         }
                     }
                 });
-           });
-            
+            });
         </script>
     </div>
 
-    <div id="graphen"></div>
 
     <a href="index.html">Zurück zur Übersicht</a>
 </body>
