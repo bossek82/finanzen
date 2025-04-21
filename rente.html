@@ -146,21 +146,21 @@
                             {
                                 label: 'Lebensstandard (€)',
                                 data: lebensstandardJahre.map(item => item.lebensstandard.toFixed(2)),
-                                borderColor: 'green',
+                                borderColor: 'orange',
                                 borderWidth: 2,
                                 fill: false
                             },
                             {
                                 label: 'Sparrücklage (€)',
                                 data: sparruecklageJahre.map(item => item.sparruecklage.toFixed(2)),
-                                borderColor: 'orange',
+                                borderColor: 'green',
                                 borderWidth: 2,
                                 fill: false
                             },
                             {
                                 label: 'Entfallende Ausgaben (€)',
                                 data: entfallendeAusgabenJahre.map(item => item.entfallendeAusgaben.toFixed(2)),
-                                borderColor: 'red',
+                                borderColor: 'black',
                                 borderWidth: 2,
                                 fill: false
                             }
@@ -309,13 +309,24 @@
         <h2>Monatlicher Bedarf und Rentenlücke ab Renteneintritt bis Tod</h2>
         <canvas id="bedarf-und-rente-ab-rente-graph" width="400" height="200"></canvas>
         <div id="bedarf-und-rente-ab-rente-ergebnisse">
+            <p id="lebensstandard-ab-rente"></p>
+            <p id="geschaetzte-rente-ab-rente"></p>
             <p id="lebensstandard-bei-tod"></p>
+            <p id="geschaetzte-rente-ab-rente"></p>
             <p id="rente-bei-tod"></p>
+            <p id="delta-am-anfang-rente"></p>
             <p id="delta-bei-tod"></p>
         </div>
         <script>
             document.getElementById('berechnen-button').addEventListener('click', function () {
-                const lebensstandardBeiRente = parseFloat(document.getElementById('lebensstandard-bei-rente').textContent.match(/[\d,.]+/)[0].replace(',', '.'));
+                const nettoeinkommen = parseFloat(document.getElementById('nettoeinkommen').value);
+                const gehaltswachstum = parseFloat(document.getElementById('gehaltswachstum').value) / 100;
+                const jahreBisRente = parseInt(document.getElementById('jahre-bis-rente').value);
+                const entfallendeAusgaben = parseFloat(document.getElementById('entfallende-ausgaben').value);
+                const sparruecklage = parseFloat(document.getElementById('sparruecklage').value);
+
+                const nettoeinkommenBeiRente = nettoeinkommen * Math.pow(1 + gehaltswachstum, jahreBisRente);
+                const lebensstandardBeiRente = nettoeinkommenBeiRente - entfallendeAusgaben - sparruecklage;
                 const geschaetzteRente = parseFloat(document.getElementById('geschaetzte-rente').value);
                 const rentenentwicklung = parseFloat(document.getElementById('rentenentwicklung').value) / 100;
                 const inflation = parseFloat(document.getElementById('inflation').value) / 100;
@@ -334,15 +345,22 @@
                     aktuellerBedarf += aktuellerBedarf * inflation;
                     aktuelleRente += aktuelleRente * rentenentwicklung;
                 }
+                
+                document.getElementById('lebensstandard-ab-rente').textContent = `Voraussichtlicher Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} € (Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} €, Entfallende Ausgaben: ${entfallendeAusgaben.toFixed(2)} €, Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
 
                 const lebensstandardBeiTod = bedarfJahre[jahreAbRente].bedarf;
-                document.getElementById('lebensstandard-bei-tod').textContent = `Lebensstandard bei Tod: ${lebensstandardBeiTod.toFixed(2)} € (inkl. Inflation von ${(inflation * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
+                document.getElementById('lebensstandard-bei-tod').textContent = `Voraussichtlicher Lebensstandard bei Tod: ${lebensstandardBeiTod.toFixed(2)} € (ausgehend vom Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} €, inkl. Inflation von ${(inflation * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
+
+                document.getElementById('geschaetzte-rente-ab-rente').textContent = `Geschätzte Rente bei Renteneintritt: ${geschaetzteRente.toFixed(2)} €`;
 
                 const renteBeiTod = renteJahre[jahreAbRente].rente;
-                document.getElementById('rente-bei-tod').textContent = `Geschätzte Rente bei Tod: ${renteBeiTod.toFixed(2)} € (inkl. Rentenentwicklung von ${(rentenentwicklung * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
-
+                document.getElementById('rente-bei-tod').textContent = `Voraussichtliche Rente bei Tod: ${renteBeiTod.toFixed(2)} € (inkl. Rentenentwicklung von ${(rentenentwicklung * 100).toFixed(1)} % pro Jahr über ${jahreAbRente} Jahre)`;
+                
+                const deltaAmAnfang = lebensstandardBeiRente - geschaetzteRente;
+                document.getElementById('delta-am-anfang-rente').textContent = `Rentenlücke zu Beginn der Rente (= Lebensstandard - Rente): ${deltaAmAnfang.toFixed(2)} €`;
+                                
                 const deltaBeiTod = deltaJahre[jahreAbRente].delta;
-                document.getElementById('delta-bei-tod').textContent = `Delta bei Tod (Bedarf - Rente): ${deltaBeiTod.toFixed(2)} €`;
+                document.getElementById('delta-bei-tod').textContent = `Rentenlücke bei Tod (= Lebensstandard - Rente): ${deltaBeiTod.toFixed(2)} €`;
 
                 const ctx = document.getElementById('bedarf-und-rente-ab-rente-graph').getContext('2d');
                 // Destroy existing chart instance if it exists before creating a new one
@@ -357,16 +375,16 @@
                         labels: bedarfJahre.map(item => `Jahr ${item.jahr}`),
                         datasets: [
                             {
-                                label: 'Monatlicher Bedarf (€)',
+                                label: 'Lebensstandard (€)',
                                 data: bedarfJahre.map(item => item.bedarf),
-                                borderColor: 'blue',
+                                borderColor: 'orange',
                                 borderWidth: 2,
                                 fill: false
                             },
                             {
                                 label: 'Geschätzte Rente (€)',
                                 data: renteJahre.map(item => item.rente),
-                                borderColor: 'green',
+                                borderColor: 'blue',
                                 borderWidth: 2,
                                 fill: false
                             },
