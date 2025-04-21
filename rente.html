@@ -61,6 +61,7 @@
             document.getElementById('berechnen-button').onclick = function () {
             // Reset all result fields before calculation
             document.getElementById('nettoeinkommen-am-anfang').textContent = '';
+            document.getElementById('vermoegen-am-anfang-rente').textContent = '';
             document.getElementById('nettoeinkommen-bei-rente').textContent = '';
             document.getElementById('lebensstandard-am-anfang').textContent = '';
             document.getElementById('lebensstandard-bei-rente').textContent = '';
@@ -452,7 +453,7 @@
         <h2>Vermögensentwicklung ab Renteneintritt bis Tod</h2>
         <canvas id="vermoegensentwicklung-ab-rente-graph" width="400" height="200"></canvas>
         <div id="vermoegensentwicklung-ab-rente-ergebnisse">
-            <p id="vermoegen-am-anfang"></p>
+            <p id="vermoegen-am-anfang-rente"></p>
             <p id="vermoegen-bei-tod"></p>
             <p id="vermoegen-ohne-entnahme-bei-tod"></p>
             <p id="entnommenes-vermoegen"></p>
@@ -482,21 +483,25 @@
                     const delta = aktuellerBedarf - aktuelleRente;
                     const entnommen = delta * 12;
                     gesamtEntnommen += entnommen;
-                    aktuellesVermoegen = aktuellesVermoegen - entnommen + (aktuellesVermoegen * zinssatz);
+                    const aktuellesVermoegen_neu = aktuellesVermoegen - entnommen + (aktuellesVermoegen * zinssatz);
+                    aktuellesVermoegen = aktuellesVermoegen_neu;
                     vermoegenOhneEntnahme += vermoegenOhneEntnahme * zinssatz;
 
                     vermoegenJahre.push({ jahr, vermoegen: aktuellesVermoegen });
-                    vermoegenOhneEntnahmeJahre.push({ jahr, vermoegen: vermoegenOhneEntnahme });
+                    vermoegenOhneEntnahmeJahre.push({ jahr, vermoegenohne: vermoegenOhneEntnahme });
                     entnommenesVermoegenJahre.push({ jahr, entnommen: gesamtEntnommen });
                     deltaJahre.push({ jahr, delta: delta * 12 });
 
-                    aktuellerBedarf += aktuellerBedarf * inflation;
-                    aktuelleRente += aktuelleRente * rentenentwicklung;
+                    const aktuellerBedarf_neu = aktuellerBedarf * inflation;
+                    aktuellerBedarf = aktuellerBedarf_neu;
+                    
+                    const aktuelleRente_neu = aktuelleRente * rentenentwicklung;
+                    aktuelleRente = aktuelleRente_neu;
                 }
 
-                document.getElementById('vermoegen-am-anfang').textContent = `Vermögen zu Beginn: ${vermoegenJahre[0].vermoegen.toFixed(2)} €`;
-                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod (mit Entnahme): ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} €`;
-                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod (ohne Entnahme): ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegen.toFixed(2)} €`;
+                document.getElementById('vermoegen-am-anfang-rente').textContent = `Vermögen zu Beginn: ${vermoegenJahre[0].vermoegen.toFixed(2)} €`;
+                document.getElementById('vermoegen-bei-tod').textContent = `Vermögen bei Tod mit Entnahme: ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} €`;
+                document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = `Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegenohne.toFixed(2)} €`;
                 document.getElementById('entnommenes-vermoegen').textContent = `Bis zum Tod entnommenes Vermögen: ${gesamtEntnommen.toFixed(2)} €`;
                 document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr: ${deltaJahre.map(item => `Jahr ${item.jahr}: ${item.delta.toFixed(2)} €`).join(', ')}`;
 
@@ -519,7 +524,7 @@
                             },
                             {
                                 label: 'Vermögen ohne Entnahme (€)',
-                                data: vermoegenOhneEntnahmeJahre.map(item => item.vermoegen.toFixed(2)),
+                                data: vermoegenOhneEntnahmeJahre.map(item => item.vermoegenohne.toFixed(2)),
                                 borderColor: 'green',
                                 borderWidth: 2,
                                 fill: false
