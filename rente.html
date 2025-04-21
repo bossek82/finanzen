@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Rentenlücke 9</h1>
-    <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
+    <div id="rentenluecke-header">
+        <h1>Rentensituation berechnen</h1>
+        <p>Berechnen Sie Ihre Rentenlücke basierend auf Ihren aktuellen Einnahmen, Ausgaben und weiteren Parametern.</p>
+    </div>
 
     <form id="rentenluecke-form">
         <fieldset>
@@ -20,7 +22,7 @@
             <label for="gehaltswachstum">Gehaltswachstum (% pro Jahr):</label>
             <input type="number" id="gehaltswachstum" name="gehaltswachstum" value="1.5" step="0.1" required><br>
 
-            <label for="entfallende-ausgaben">Aktuelle Ausgaben, die in der Rente entfallen (€):</label>
+            <label for="entfallende-ausgaben">Aktuelle Ausgaben, die in der Rente entfallen, z.B. Kredit (€):</label>
             <input type="number" id="entfallende-ausgaben" name="entfallende-ausgaben" value="1200" required><br>
         </fieldset>
 
@@ -29,10 +31,10 @@
             <label for="sparruecklage">Monatliche Sparrücklage (€):</label>
             <input type="number" id="sparruecklage" name="sparruecklage" value="1000" required><br>
 
-            <label for="kapital">Vorhandenes Kapital (€):</label>
+            <label for="kapital">Vorhandenes Vermögen (€):</label>
             <input type="number" id="kapital" name="kapital" value="10000" required><br>
 
-            <label for="zinssatz">Jährlicher Zinssatz Sparvermögen (%):</label>
+            <label for="zinssatz">Jährlicher Zinssatz auf Vermögen (%):</label>
             <input type="number" id="zinssatz" name="zinssatz" value="6" step="0.1" required><br>
         </fieldset>
         <fieldset>
@@ -40,7 +42,7 @@
             <label for="jahre-bis-rente">Jahre bis zur Rente:</label>
             <input type="number" id="jahre-bis-rente" name="jahre-bis-rente" value="24" required><br>
 
-            <label for="geschaetzte-rente">Geschätzte Rente (€):</label>
+            <label for="geschaetzte-rente">Geschätzte monatliche Rente (€):</label>
             <input type="number" id="geschaetzte-rente" name="geschaetzte-rente" value="2200" required><br>
 
             <label for="rentenentwicklung">Jährliche Rentenentwicklung (%):</label>
@@ -51,7 +53,7 @@
 
         </fieldset>
 
-        <label for="inflation">Inflation (% pro Jahr):</label>
+        <label for="inflation">Jährliche Inflation (%):</label>
         <input type="number" id="inflation" name="inflation" value="2" step="0.1" required><br>
 
         <button type="button" id="berechnen-button">Berechnen</button>
@@ -74,14 +76,12 @@
             document.getElementById('entnommenes-vermoegen').textContent = '';
             document.getElementById('delta-pro-jahr').textContent = '';
 
-            // Trigger recalculation and update results
-            // Removed recursive event dispatch to prevent infinite loop
             };
         </script>
     </form>
 
     <div id="berechnete-werte-bis-rente">
-        <h2>Berechneter monatlicher Bedarf bis Renteneintritt</h2>
+        <h2>Monatlicher Bedarf bis Renteneintritt</h2>
         <canvas id="nettoeinkommen-graph" width="400" height="200"></canvas>
         <div id="berechnete-ergebnisse">
             <p id="nettoeinkommen-am-anfang"></p>
@@ -113,19 +113,25 @@
                 }
 
                 const nettoeinkommenAmAnfang = nettoeinkommenJahre[0].einkommen;
-                document.getElementById('nettoeinkommen-am-anfang').textContent = `Nettoeinkommen am Anfang (entsprechend Eingabewert): ${nettoeinkommenAmAnfang.toFixed(2)} €`;
+                document.getElementById('nettoeinkommen-am-anfang').textContent = `Nettoeinkommen aktuell: ${nettoeinkommenAmAnfang.toFixed(2)} €`;
 
                 const nettoeinkommenBeiRente = nettoeinkommenJahre[jahreBisRente].einkommen;
-                document.getElementById('nettoeinkommen-bei-rente').textContent = `Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € (ausgehend von aktuellem Nettoeinkommen: ${nettoeinkommen.toFixed(2)} €, Gehaltswachstum: ${(gehaltswachstum * 100).toFixed(1)} % pro Jahr, über ${jahreBisRente} Jahre)`;
+                document.getElementById('nettoeinkommen-bei-rente').textContent = `voraussichtliches Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € (aktuelles Nettoeinkommen: ${nettoeinkommen.toFixed(2)} €, jährliches Gehaltswachstum: ${(gehaltswachstum * 100).toFixed(1)} % über ${jahreBisRente} Jahre).`;
 
                 const lebensstandardAmAnfang = lebensstandardJahre[0].lebensstandard;
-                document.getElementById('lebensstandard-am-anfang').textContent = `Lebensstandard am Anfang: ${lebensstandardAmAnfang.toFixed(2)} € (= Nettoeinkommen: ${nettoeinkommen.toFixed(2)} € - Entfallende Ausgaben: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
+                document.getElementById('lebensstandard-am-anfang').textContent = `Lebensstandard aktuell abzgl. wegfallender Ausgaben: ${lebensstandardAmAnfang.toFixed(2)} € (= Nettoeinkommen: ${nettoeinkommen.toFixed(2)} € - Entfallende Ausgaben in Rente: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
 
                 const lebensstandardBeiRente = nettoeinkommenBeiRente - entfallendeAusgaben - sparruecklage;
-                document.getElementById('lebensstandard-bei-rente').textContent = `Lebensstandard bei Renteneintritt: ${lebensstandardBeiRente.toFixed(2)} € (= Nettoeinkommen bei Renteneintritt: ${nettoeinkommenBeiRente.toFixed(2)} € - Entfallende Ausgaben: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
+                document.getElementById('lebensstandard-bei-rente').textContent = `Voraussichtlicher Lebensstandard bei Renteneintritt abzgl. wegfallender Ausgaben: ${lebensstandardBeiRente.toFixed(2)} € (= Nettoeinkommen: ${nettoeinkommenBeiRente.toFixed(2)} € - Entfallende Ausgaben in Rente: ${entfallendeAusgaben.toFixed(2)} € - Sparrücklage: ${sparruecklage.toFixed(2)} €)`;
 
                 const ctx = document.getElementById('nettoeinkommen-graph').getContext('2d');
-                new Chart(ctx, {
+                // Destroy existing chart instance if it exists before creating a new one
+                if (window.nettoeinkommenChart) {
+                    window.nettoeinkommenChart.destroy();
+                }
+
+                // Create a new chart instance and store it in a global variable
+                window.nettoeinkommenChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: nettoeinkommenJahre.map(item => `Jahr ${item.jahr}`),
@@ -190,7 +196,7 @@
     </div>
 
     <div id="graphen-bis-rente">
-        <h2>Berechneter Vermögensaufbau bis Renteneintritt</h2>
+        <h2>Vermögensaufbau bis Renteneintritt</h2>
         <canvas id="vermoegensaufbau-graph" width="400" height="200"></canvas>
         <div id="vermoegensaufbau-ergebnisse">
             <p id="vermoegen-am-anfang"></p>
@@ -224,19 +230,25 @@
                 }
 
                 const vermoegenAmAnfang = vermoegenJahre[0].vermoegen;
-                document.getElementById('vermoegen-am-anfang').textContent = `Vermögen am Anfang: ${vermoegenAmAnfang.toFixed(2)} €`;
+                document.getElementById('vermoegen-am-anfang').textContent = `Vermögen aktuell: ${vermoegenAmAnfang.toFixed(2)} €`;
 
                 const vermoegenBeiRente = vermoegenJahre[jahreBisRente].vermoegen;
-                document.getElementById('vermoegen-bei-rente').textContent = `Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €`;
+                document.getElementById('vermoegen-bei-rente').textContent = `voraussichtliches Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} €`;
 
                 const nettoGespart = sparruecklage * 12 * jahreBisRente;
-                document.getElementById('netto-gespart').textContent = `Netto gespart (ohne Zinsen): ${nettoGespart.toFixed(2)} €`;
+                document.getElementById('netto-gespart').textContent = `Gespartes Vermögen (ohne Zinsen): ${nettoGespart.toFixed(2)} €`;
 
                 const zinsvermoegen = gesamtZinsen;
-                document.getElementById('zinsvermoegen').textContent = `Zinsen erwirtschaftet: ${zinsvermoegen.toFixed(2)} €`;
+                document.getElementById('zinsvermoegen').textContent = `Zusätzliches Vermögen durch Zinsen: ${zinsvermoegen.toFixed(2)} €`;
 
                 const ctx = document.getElementById('vermoegensaufbau-graph').getContext('2d');
-                new Chart(ctx, {
+                // Destroy existing chart instance if it exists before creating a new one
+                if (window.vermoegensaufbauChart) {
+                    window.vermoegensaufbauChart.destroy();
+                }
+
+                // Create a new chart instance and store it in a global variable
+                window.vermoegensaufbauChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: vermoegenJahre.map(item => `Jahr ${item.jahr}`),
@@ -293,11 +305,8 @@
         </script>
     </div>
 
-
- 
-
     <div id="monatlicher-bedarf-ab-rente">
-        <h2>Monatlicher Bedarf und geschätzte Rente ab Renteneintritt bis Tod</h2>
+        <h2>Monatlicher Bedarf und Rentenlücke ab Renteneintritt bis Tod</h2>
         <canvas id="bedarf-und-rente-ab-rente-graph" width="400" height="200"></canvas>
         <div id="bedarf-und-rente-ab-rente-ergebnisse">
             <p id="lebensstandard-bei-tod"></p>
@@ -336,28 +345,34 @@
                 document.getElementById('delta-bei-tod').textContent = `Delta bei Tod (Bedarf - Rente): ${deltaBeiTod.toFixed(2)} €`;
 
                 const ctx = document.getElementById('bedarf-und-rente-ab-rente-graph').getContext('2d');
-                new Chart(ctx, {
+                // Destroy existing chart instance if it exists before creating a new one
+                if (window.bedarfUndRenteChart) {
+                    window.bedarfUndRenteChart.destroy();
+                }
+
+                // Create a new chart instance and store it in a global variable
+                window.bedarfUndRenteChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: bedarfJahre.map(item => `Jahr ${item.jahr}`),
                         datasets: [
                             {
                                 label: 'Monatlicher Bedarf (€)',
-                                data: bedarfJahre.map(item => item.bedarf.toFixed(2)),
+                                data: bedarfJahre.map(item => item.bedarf),
                                 borderColor: 'blue',
                                 borderWidth: 2,
                                 fill: false
                             },
                             {
                                 label: 'Geschätzte Rente (€)',
-                                data: renteJahre.map(item => item.rente.toFixed(2)),
+                                data: renteJahre.map(item => item.rente),
                                 borderColor: 'green',
                                 borderWidth: 2,
                                 fill: false
                             },
                             {
                                 label: 'Delta (Bedarf - Rente) (€)',
-                                data: deltaJahre.map(item => item.delta.toFixed(2)),
+                                data: deltaJahre.map(item => item.delta),
                                 borderColor: 'red',
                                 borderWidth: 2,
                                 fill: false
@@ -389,10 +404,11 @@
                         }
                     }
                 });
+                
             });
         </script>
     <div id="vermoegensentwicklung-ab-rente">
-        <h2>Vermögensentwicklung ab Rente bis Tod</h2>
+        <h2>Vermögensentwicklung ab Renteneintritt bis Tod</h2>
         <canvas id="vermoegensentwicklung-ab-rente-graph" width="400" height="200"></canvas>
         <div id="vermoegensentwicklung-ab-rente-ergebnisse">
             <p id="vermoegen-bei-tod"></p>
@@ -448,7 +464,13 @@
                 document.getElementById('delta-pro-jahr').textContent = `Delta pro Jahr (hochgerechnet): ${deltaProJahr} (berechnet aus dem jährlichen Delta zwischen Bedarf und geschätzter Rente).`;
 
                 const ctx = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
-                new Chart(ctx, {
+                // Destroy existing chart instance if it exists before creating a new one
+                if (window.vermoegensentwicklungChart) {
+                    window.vermoegensentwicklungChart.destroy();
+                }
+
+                // Create a new chart instance and store it in a global variable
+                window.vermoegensentwicklungChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: vermoegenJahre.map(item => `Jahr ${item.jahr}`),
@@ -508,7 +530,8 @@
                         }
                     }
                 });
-            });
+           });
+            
         </script>
     </div>
 
