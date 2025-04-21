@@ -5,55 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rentenlücke</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style type="text/css">
-        body {
-          font-family: system-ui, sans-serif;
-          background-color: #f9f9f9;
-          color: #333;
-          margin: 0;
-          padding: 2rem;
-        }
-        h1 {
-          text-align: center;
-          font-size: 1.8rem;
-        }
-        .container {
-          max-width: 500px;
-          margin: auto;
-          background: #fff;
-          padding: 2rem;
-          border-radius: 1rem;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        label {
-          display: block;
-          margin-top: 1rem;
-        }
-        input {
-          width: 100%;
-          padding: 0.5rem;
-          margin-top: 0.25rem;
-          border: 1px solid #ccc;
-          border-radius: 0.5rem;
-        }
-        button {
-          margin-top: 1.5rem;
-          width: 100%;
-          padding: 0.75rem;
-          border: none;
-          background-color: #333;
-          color: white;
-          font-size: 1rem;
-          border-radius: 0.5rem;
-          cursor: pointer;
-        }
-        .output {
-          margin-top: 2rem;
-          padding: 1rem;
-          background-color: #eee;
-          border-radius: 0.5rem;
-        }
-      </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Rentenlücke 9</h1>
@@ -83,7 +35,7 @@
             <label for="zinssatz">Jährlicher Zinssatz Sparvermögen (%):</label>
             <input type="number" id="zinssatz" name="zinssatz" value="6" step="0.1" required><br>
         </fieldset>
-        <fieldset></fieldset>
+        <fieldset>
             <legend>Rente</legend>
             <label for="jahre-bis-rente">Jahre bis zur Rente:</label>
             <input type="number" id="jahre-bis-rente" name="jahre-bis-rente" value="24" required><br>
