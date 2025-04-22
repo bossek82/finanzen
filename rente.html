@@ -51,6 +51,8 @@
             <label for="jahre-ab-rente">Jahre ab Rente bis zum Tod:</label>
             <input type="number" id="jahre-ab-rente" name="jahre-ab-rente" value="25" step="1" required><br>
 
+            <label for="zusatzvermoegen">Netto Zusatzvermögen ab Renteneintritt, z.B. Auszahlung Betriebsrente (€):</label>
+            <input type="number" id="zusatzvermoegen" name="zusatzvermoegen" value="100000" step="1000" required><br>
         </fieldset>
 
         <label for="inflation">Jährliche Inflation (%):</label>
@@ -60,26 +62,36 @@
         <script>
             document.getElementById('berechnen-button').onclick = function () {
             // Reset all result fields before calculation
-            document.getElementById('nettoeinkommen-am-anfang').textContent = '';
-            document.getElementById('vermoegen-am-anfang-rente').textContent = '';
-            document.getElementById('nettoeinkommen-bei-rente').textContent = '';
-            document.getElementById('lebensstandard-am-anfang').textContent = '';
-            document.getElementById('lebensstandard-bei-rente').textContent = '';
-            document.getElementById('vermoegen-am-anfang').textContent = '';
-            document.getElementById('vermoegen-bei-rente').textContent = '';
-            document.getElementById('netto-gespart').textContent = '';
-            document.getElementById('zinsvermoegen').textContent = '';
-            document.getElementById('lebensstandard-ab-rente').textContent = '';
-            document.getElementById('geschaetzte-rente-ab-rente').textContent = '';
-            document.getElementById('lebensstandard-bei-tod').textContent = '';
-            document.getElementById('rente-bei-tod').textContent = '';
-            document.getElementById('delta-am-anfang-rente').textContent = '';
-            document.getElementById('delta-bei-tod').textContent = '';
-            document.getElementById('vermoegen-bei-tod').textContent = '';
-            document.getElementById('vermoegen-ohne-entnahme-bei-tod').textContent = '';
-            document.getElementById('entnommenes-vermoegen').textContent = '';
-            document.getElementById('delta-pro-jahr').textContent = '';
+            const fieldsToReset = [
+                'nettoeinkommen-am-anfang',
+                'vermoegen-am-anfang-rente',
+                'nettoeinkommen-bei-rente',
+                'lebensstandard-am-anfang',
+                'lebensstandard-bei-rente',
+                'vermoegen-am-anfang',
+                'vermoegen-bei-rente',
+                'netto-gespart',
+                'zinsvermoegen',
+                'lebensstandard-ab-rente',
+                'geschaetzte-rente-ab-rente',
+                'lebensstandard-bei-tod',
+                'rente-bei-tod',
+                'delta-am-anfang-rente',
+                'delta-bei-tod',
+                'vermoegen-bei-tod',
+                'vermoegen-ohne-entnahme-bei-tod',
+                'entnommenes-vermoegen',
+                'delta-pro-jahr',
+                'zusatzvermoegen-am-anfang-rente',
+                'vermoegen-am-anfang-rente-ohne-zusatz'
+            ];
 
+            fieldsToReset.forEach(fieldId => {
+                const element = document.getElementById(fieldId);
+                if (element) {
+                    element.textContent = '';
+                }
+            });
             };
         </script>
     </form>
@@ -452,6 +464,8 @@
         <h2>Vermögensentwicklung ab Renteneintritt bis Tod</h2>
         <canvas id="vermoegensentwicklung-ab-rente-graph"></canvas>
         <div id="vermoegensentwicklung-ab-rente-ergebnisse">
+            <p id="vermoegen-am-anfang-rente-ohne-zusatz"></p>
+            <p id="zusatzvermoegen-am-anfang-rente"></p>
             <p id="vermoegen-am-anfang-rente"></p>
             <p id="vermoegen-bei-tod"></p>
             <p id="vermoegen-ohne-entnahme-bei-tod"></p>
@@ -461,6 +475,8 @@
         <script>
             document.getElementById('berechnen-button').addEventListener('click', function () {
                 const vermoegenBeiRente = globalVermoegenBeiRente;
+                const zusatzvermoegen = parseFloat(document.getElementById('zusatzvermoegen').value);
+                const vermoegenBeiRenteMitZusatz = vermoegenBeiRente + zusatzvermoegen;
                 const lebensstandardBeiRente = globalLebensStandardbeiRente;
                 const geschaetzteRente = parseFloat(document.getElementById('geschaetzte-rente').value);
                 const rentenentwicklung = parseFloat(document.getElementById('rentenentwicklung').value) / 100;
@@ -468,7 +484,7 @@
                 const zinssatz = parseFloat(document.getElementById('zinssatz').value) / 100;
                 const jahreAbRente = parseInt(document.getElementById('jahre-ab-rente').value);
 
-                console.log('Vermögen bei Rente:', vermoegenBeiRente);
+                console.log('Vermögen bei Rente:', vermoegenBeiRenteMitZusatz);
                 console.log('Lebensstandard bei Rente:', lebensstandardBeiRente);
                 console.log('Geschätzte Rente:', geschaetzteRente);
                 console.log('Rentenentwicklung (%):', rentenentwicklung * 100);
@@ -480,8 +496,8 @@
                 const vermoegenOhneEntnahmeJahre = [];
                 const entnommenesVermoegenJahre = [];
                 const deltaJahre = [];
-                let aktuellesVermoegen = vermoegenBeiRente;
-                let vermoegenOhneEntnahme = vermoegenBeiRente;
+                let aktuellesVermoegen = vermoegenBeiRenteMitZusatz;
+                let vermoegenOhneEntnahme = vermoegenBeiRenteMitZusatz;
                 let gesamtEntnommen = 0;
                 let aktuellerBedarf = lebensstandardBeiRente;
                 let aktuelleRente = geschaetzteRente;
@@ -504,11 +520,15 @@
                     aktuelleRente += aktuelleRente * rentenentwicklung;
                 }
 
-                document.getElementById('vermoegen-am-anfang-rente').innerHTML = `<strong>Vermögen bei Renteneintritt: ${vermoegenJahre[0].vermoegen.toFixed(2)} €</strong>`;
+                document.getElementById('vermoegen-am-anfang-rente-ohne-zusatz').innerHTML += `<strong>Vermögen bei Renteneintritt (ohne Zusatzvermögen): ${vermoegenBeiRente.toFixed(2)} €</strong>`;
                 
-                document.getElementById('vermoegen-bei-tod').innerHTML = `<strong>Vermögen bei Tod mit Entnahme: ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} €</strong><br>= Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € - jährlich entnommenes Vermögen + Zinsen auf verbleibendes Vermögen über ${jahreAbRente} Jahre mit einem Zinssatz von ${(zinssatz * 100).toFixed(1)} %`;
+                document.getElementById('zusatzvermoegen-am-anfang-rente').innerHTML += `<strong>Zusatzvermögen zum Renteneintritt: ${zusatzvermoegen.toFixed(2)} €</strong>`;
                 
-                document.getElementById('vermoegen-ohne-entnahme-bei-tod').innerHTML = `<strong>Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegenohne.toFixed(2)} €</strong><br>= Vermögen bei Renteneintritt: ${vermoegenBeiRente.toFixed(2)} € * jährliche Zinsen von ${(zinssatz * 100).toFixed(1)} % über ${jahreAbRente} Jahre, ohne Entnahmen`;
+                document.getElementById('vermoegen-am-anfang-rente').innerHTML = `<strong>Gesamtvermögen bei Renteneintritt: ${vermoegenJahre[0].vermoegen.toFixed(2)} €</strong>`;
+                
+                document.getElementById('vermoegen-bei-tod').innerHTML = `<strong>Vermögen bei Tod mit Entnahme: ${vermoegenJahre[jahreAbRente].vermoegen.toFixed(2)} €</strong><br>= Vermögen bei Renteneintritt: ${vermoegenBeiRenteMitZusatz.toFixed(2)} € - jährlich entnommenes Vermögen + Zinsen auf verbleibendes Vermögen über ${jahreAbRente} Jahre mit einem Zinssatz von ${(zinssatz * 100).toFixed(1)} %`;
+                
+                document.getElementById('vermoegen-ohne-entnahme-bei-tod').innerHTML = `<strong>Vermögen bei Tod ohne Entnahme: ${vermoegenOhneEntnahmeJahre[jahreAbRente].vermoegenohne.toFixed(2)} €</strong><br>= Vermögen bei Renteneintritt: ${vermoegenBeiRenteMitZusatz.toFixed(2)} € * jährliche Zinsen von ${(zinssatz * 100).toFixed(1)} % über ${jahreAbRente} Jahre, ohne Entnahmen`;
                 
                 document.getElementById('entnommenes-vermoegen').innerHTML = `<strong>Bis zum Tod entnommenes Vermögen: ${gesamtEntnommen.toFixed(2)} €</strong><br>= Summe der jährlichen Entnahmen über ${jahreAbRente} Jahre, basierend auf dem jährlichen Delta zwischen Lebensstandard und geschätzter Rente`;
                 
