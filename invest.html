@@ -9,65 +9,183 @@
 </head>
 <body>
     <h1>Page under Development: Investmentverteilung</h1>
-    <label for="vermoegen">Vermögen:</label>
-    <input type="number" id="vermoegen" name="vermoegen" value="50000">
     <table border="1">
         <thead>
             <tr>
                 <th>Erklärung</th>
-                <th>Nicht volatil (Tagesgeld)</th>
-                <th>Leicht volatil (Gold)</th>
-                <th>Mittel volatil (MSCI World)</th>
-                <th>Sehr volatil (Bitcoin)</th>
+                <th>Kaum volatil<br>(z.B. Tagesgeld)</th>
+                <th>Leicht volatil<br>(z.B. Gold/Immobilie)</th>
+                <th>Mittel volatil<br>(z.B. MSCI World)</th>
+                <th>Hoch volatil<br>(z.B. Bitcoin)</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Prozentuale Verteilung</td>
-                <td><input type="number" id="tagesgeldProzent" value="0" min="0" max="100"></td>
-                <td><input type="number" id="goldProzent" value="0" min="0" max="100"></td>
-                <td><input type="number" id="msciProzent" value="0" min="0" max="100"></td>
-                <td><input type="number" id="bitcoinProzent" value="0" min="0" max="100"></td>
+                <td>Vermögen (€):</td>
+                <td><input type="number" id="tagesgeldVermoegen" value="15000" min="0" step="1000" placeholder="€"></td>
+                <td><input type="number" id="goldVermoegen" value="30000" min="0" step="1000" placeholder="€"></td>
+                <td><input type="number" id="msciVermoegen" value="60000" min="0" step="1000" placeholder="€"></td>
+                <td><input type="number" id="bitcoinVermoegen" value="20000" min="0" step="1000" placeholder="€"></td>
             </tr>
             <tr>
-                <td>Berechneter Wert</td>
-                <td id="tagesgeldWert">0</td>
-                <td id="goldWert">0</td>
-                <td id="msciWert">0</td>
-                <td id="bitcoinWert">0</td>
+                <td>Prozentualer Anteil vom Gesamtvermögen:</td>
+                <td id="tagesgeldWert"></td>
+                <td id="goldWert"></td>
+                <td id="msciWert"></td>
+                <td id="bitcoinWert"></td>
             </tr>
             <tr>
-                <td>Zinssatz</td>
-                <td><input type="number" id="tagesgeldZins" value="0" min="0" step="0.01" placeholder="Zins %"></td>
-                <td><input type="number" id="goldZins" value="0" min="0" step="0.01" placeholder="Zins %"></td>
-                <td><input type="number" id="msciZins" value="0" min="0" step="0.01" placeholder="Zins %"></td>
-                <td><input type="number" id="bitcoinZins" value="0" min="0" step="0.01" placeholder="Zins %"></td>
+                <td>Potentieller Zinssatz (%):</td>
+                <td><input type="number" id="tagesgeldZins" value="3" min="0" step="1" placeholder="Zins %"></td>
+                <td><input type="number" id="goldZins" value="5" min="0" step="1" placeholder="Zins %"></td>
+                <td><input type="number" id="msciZins" value="7" min="0" step="1" placeholder="Zins %"></td>
+                <td><input type="number" id="bitcoinZins" value="10" min="0" step="1" placeholder="Zins %"></td>
+            </tr>
+            <tr>
+                <td>Volatilität (%):</td>
+                <td><input type="number" id="tagesgeldVolatilitaet" value="1" min="0" step="1" placeholder="Volatilität %"></td>
+                <td><input type="number" id="goldVolatilitaet" value="10" min="0" step="1" placeholder="Volatilität %"></td>
+                <td><input type="number" id="msciVolatilitaet" value="20" min="0" step="1" placeholder="Volatilität %"></td>
+                <td><input type="number" id="bitcoinVolatilitaet" value="50" min="0" step="1" placeholder="Volatilität %"></td>
+            </tr>
+            <tr>
+                <td>Anlagezeit (Jahre):</td>
+                <td colspan="4"><input type="number" id="anlagezeit" value="25" min="0" step="1" placeholder="Jahre"></td>
             </tr>
         </tbody>
     </table>
     <button onclick="berechneWerte()">Berechnen</button>
 
+    <h2>Vermögensentwicklung ohne Volatilität</h2>
+    <canvas id="vermoegensentwicklung-graph" width="400" height="200"></canvas>
+    <script>
+        // Initialisiere den Graphen ohne Werte
+        const ctx = document.getElementById('vermoegensentwicklung-graph').getContext('2d');
+        window.vermoegensentwicklungChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Keine Labels vor der Berechnung
+                datasets: [
+                    {
+                        label: 'Tagesgeld (€)',
+                        data: [],
+                        borderColor: 'blue',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Gold (€)',
+                        data: [],
+                        borderColor: 'orange',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'MSCI World (€)',
+                        data: [],
+                        borderColor: 'green',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Bitcoin (€)',
+                        data: [],
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Anlagezeit (Jahre)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Vermögen (€)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
     <script>
         function berechneWerte() {
-            const vermoegen = parseFloat(document.getElementById('vermoegen').value);
-            const tagesgeldProzent = parseFloat(document.getElementById('tagesgeldProzent').value) || 0;
-            const goldProzent = parseFloat(document.getElementById('goldProzent').value) || 0;
-            const msciProzent = parseFloat(document.getElementById('msciProzent').value) || 0;
-            const bitcoinProzent = parseFloat(document.getElementById('bitcoinProzent').value) || 0;
+            // Eingabewerte auslesen
+            const tagesgeldVermoegen = parseFloat(document.getElementById('tagesgeldVermoegen').value) || 0;
+            const goldVermoegen = parseFloat(document.getElementById('goldVermoegen').value) || 0;
+            const msciVermoegen = parseFloat(document.getElementById('msciVermoegen').value) || 0;
+            const bitcoinVermoegen = parseFloat(document.getElementById('bitcoinVermoegen').value) || 0;
 
-            const tagesgeldWert = (vermoegen * tagesgeldProzent) / 100;
-            const goldWert = (vermoegen * goldProzent) / 100;
-            const msciWert = (vermoegen * msciProzent) / 100;
-            const bitcoinWert = (vermoegen * bitcoinProzent) / 100;
+            // Gesamtvermögen berechnen
+            const gesamtVermoegen = tagesgeldVermoegen + goldVermoegen + msciVermoegen + bitcoinVermoegen;
 
-            document.getElementById('tagesgeldWert').textContent = tagesgeldWert.toFixed(2);
-            document.getElementById('goldWert').textContent = goldWert.toFixed(2);
-            document.getElementById('msciWert').textContent = msciWert.toFixed(2);
-            document.getElementById('bitcoinWert').textContent = bitcoinWert.toFixed(2);
+            // Prozentuale Anteile berechnen und anzeigen
+            document.getElementById('tagesgeldWert').textContent = gesamtVermoegen > 0 ? ((tagesgeldVermoegen / gesamtVermoegen) * 100).toFixed(1) + '%' : '0.0%';
+            document.getElementById('goldWert').textContent = gesamtVermoegen > 0 ? ((goldVermoegen / gesamtVermoegen) * 100).toFixed(1) + '%' : '0.0%';
+            document.getElementById('msciWert').textContent = gesamtVermoegen > 0 ? ((msciVermoegen / gesamtVermoegen) * 100).toFixed(1) + '%' : '0.0%';
+            document.getElementById('bitcoinWert').textContent = gesamtVermoegen > 0 ? ((bitcoinVermoegen / gesamtVermoegen) * 100).toFixed(1) + '%' : '0.0%';
+
+            // Eingabewerte auslesen
+            const tagesgeldZins = parseFloat(document.getElementById('tagesgeldZins').value) / 100 || 0;
+            const goldZins = parseFloat(document.getElementById('goldZins').value) / 100 || 0;
+            const msciZins = parseFloat(document.getElementById('msciZins').value) / 100 || 0;
+            const bitcoinZins = parseFloat(document.getElementById('bitcoinZins').value) / 100 || 0;
+            const anlagezeit = parseInt(document.getElementById('anlagezeit').value) || 0;
+
+            // Vermögensentwicklung berechnen
+            const tagesgeldEntwicklung = [];
+            const goldEntwicklung = [];
+            const msciEntwicklung = [];
+            const bitcoinEntwicklung = [];
+
+            let tagesgeldVermoegenEntwicklung = parseFloat(document.getElementById('tagesgeldVermoegen').value) || 0;
+            let goldVermoegenEntwicklung = parseFloat(document.getElementById('goldVermoegen').value) || 0;
+            let msciVermoegenEntwicklung = parseFloat(document.getElementById('msciVermoegen').value) || 0;
+            let bitcoinVermoegenEntwicklung = parseFloat(document.getElementById('bitcoinVermoegen').value) || 0;
+
+            for (let jahr = 0; jahr <= anlagezeit; jahr++) {
+                tagesgeldEntwicklung.push(tagesgeldVermoegenEntwicklung);
+                goldEntwicklung.push(goldVermoegenEntwicklung);
+                msciEntwicklung.push(msciVermoegenEntwicklung);
+                bitcoinEntwicklung.push(bitcoinVermoegenEntwicklung);
+
+                tagesgeldVermoegenEntwicklung += tagesgeldVermoegenEntwicklung * tagesgeldZins;
+                goldVermoegenEntwicklung += goldVermoegenEntwicklung * goldZins;
+                msciVermoegenEntwicklung += msciVermoegenEntwicklung * msciZins;
+                bitcoinVermoegenEntwicklung += bitcoinVermoegenEntwicklung * bitcoinZins;
+            }
+
+            // Graph aktualisieren
+            window.vermoegensentwicklungChart.data.labels = Array.from({ length: anlagezeit + 1 }, (_, i) => `Jahr ${i}`);
+            window.vermoegensentwicklungChart.data.datasets[0].data = tagesgeldEntwicklung;
+            window.vermoegensentwicklungChart.data.datasets[1].data = goldEntwicklung;
+            window.vermoegensentwicklungChart.data.datasets[2].data = msciEntwicklung;
+            window.vermoegensentwicklungChart.data.datasets[3].data = bitcoinEntwicklung;
+            window.vermoegensentwicklungChart.update();
         }
     </script>
 
-    
-<a href="index.html">Zurück zur Übersicht</a>
+    <button onclick="window.location.href='index.html'">Zurück zur Übersicht</button>
+
+    <div>
+        <br>
+        <p><strong>Haftungsausschluss:</strong> Die auf dieser Webseite bereitgestellten Informationen dienen ausschließlich allgemeinen Informationszwecken und stellen keine Finanz-, Anlage- oder sonstige Beratung dar. Es wird keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der Inhalte übernommen. Jegliche Nutzung der bereitgestellten Informationen erfolgt auf eigenes Risiko.</p>
+        <br>
+        <p>© 2025 - Entwickelt von bossek82</p>
+    </div>
 </body>
 </html>

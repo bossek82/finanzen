@@ -46,6 +46,12 @@ input {
     width: 98%;
 }
 
+input[type="number"] {
+    width: 100%;
+    max-width: 1500px; /* Begrenzung der Breite */
+    box-sizing: border-box; /* Verhindert, dass Padding die Breite beeinflusst */
+}
+
 canvas {
     display: block;
     margin: 0 auto;
