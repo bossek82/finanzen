@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Page under Development: Investmentverteilung</h1>
+    <h1>Persönliche Investmentverteilung berechnen</h1>
     <table border="1">
         <thead>
             <tr>
@@ -43,10 +43,10 @@
             </tr>
             <tr>
                 <td>Volatilität (%):</td>
-                <td><input type="number" id="tagesgeldVolatilitaet" value="1" min="0" step="1" placeholder="Volatilität %"></td>
-                <td><input type="number" id="goldVolatilitaet" value="10" min="0" step="1" placeholder="Volatilität %"></td>
-                <td><input type="number" id="msciVolatilitaet" value="20" min="0" step="1" placeholder="Volatilität %"></td>
-                <td><input type="number" id="bitcoinVolatilitaet" value="50" min="0" step="1" placeholder="Volatilität %"></td>
+                <td><input type="number" id="tagesgeldVolatilitaet" value="0" min="0" step="1" placeholder="Volatilität %"></td>
+                <td><input type="number" id="goldVolatilitaet" value="12,5" min="0" step="1" placeholder="Volatilität %"></td>
+                <td><input type="number" id="msciVolatilitaet" value="17,5" min="0" step="1" placeholder="Volatilität %"></td>
+                <td><input type="number" id="bitcoinVolatilitaet" value="80" min="0" step="1" placeholder="Volatilität %"></td>
             </tr>
             <tr>
                 <td>Anlagezeit (Jahre):</td>
@@ -54,12 +54,17 @@
             </tr>
         </tbody>
     </table>
-    <button onclick="berechneWerte()">Berechnen</button>
+    <button onclick="berechneBeideGraphen()">Berechnen</button>
 
     <h2>Vermögensentwicklung ohne Volatilität</h2>
-    <canvas id="vermoegensentwicklung-graph" width="400" height="200"></canvas>
+    <canvas id="vermoegensentwicklung-graph"></canvas>
+    <h2>Vermögensentwicklung mit Volatilität</h2>
+    <canvas id="vermoegensentwicklung-volatilitaet-graph"></canvas>
+    
     <script>
-        // Initialisiere den Graphen beim Laden der Seite
+        let volatileGraphInterval;
+
+        // Initialisiere beide Graphen beim Laden der Seite
         window.addEventListener('load', function () {
             const ctxInvest = document.getElementById('vermoegensentwicklung-graph').getContext('2d');
             window.vermoegensentwicklungChart = new Chart(ctxInvest, {
@@ -70,7 +75,31 @@
                         { label: 'Tagesgeld (€)', data: [], borderColor: 'blue', borderWidth: 2, fill: false },
                         { label: 'Gold (€)', data: [], borderColor: 'orange', borderWidth: 2, fill: false },
                         { label: 'MSCI World (€)', data: [], borderColor: 'green', borderWidth: 2, fill: false },
-                        { label: 'Bitcoin (€)', data: [], borderColor: 'red', borderWidth: 2, fill: false }
+                        { label: 'Bitcoin (€)', data: [], borderColor: 'red', borderWidth: 2, fill: false },
+                        { label: 'Gesamtvermögen (€)', data: [], borderColor: 'black', borderWidth: 2, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true, position: 'top' } },
+                    scales: {
+                        x: { title: { display: true, text: 'Anlagezeit (Jahre)' } },
+                        y: { title: { display: true, text: 'Vermögen (€)' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            const ctxVolatilitaet = document.getElementById('vermoegensentwicklung-volatilitaet-graph').getContext('2d');
+            window.vermoegensentwicklungVolatilitaetChart = new Chart(ctxVolatilitaet, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Tagesgeld (€)', data: [], borderColor: 'blue', borderWidth: 2, fill: false },
+                        { label: 'Gold (€)', data: [], borderColor: 'orange', borderWidth: 2, fill: false },
+                        { label: 'MSCI World (€)', data: [], borderColor: 'green', borderWidth: 2, fill: false },
+                        { label: 'Bitcoin (€)', data: [], borderColor: 'red', borderWidth: 2, fill: false },
+                        { label: 'Gesamtvermögen (€)', data: [], borderColor: 'black', borderWidth: 2, fill: false }
                     ]
                 },
                 options: {
@@ -83,9 +112,8 @@
                 }
             });
         });
-    </script>
-    <script>
-        function berechneWerte() {
+
+        function berechneOhneVolatilitaet() {
             // Eingabewerte auslesen
             const tagesgeldVermoegen = parseFloat(document.getElementById('tagesgeldVermoegen').value) || 0;
             const goldVermoegen = parseFloat(document.getElementById('goldVermoegen').value) || 0;
@@ -113,22 +141,26 @@
             const goldEntwicklung = [];
             const msciEntwicklung = [];
             const bitcoinEntwicklung = [];
+            const gesamtEntwicklung = [];
 
             let tagesgeldVermoegenEntwicklung = parseFloat(document.getElementById('tagesgeldVermoegen').value) || 0;
             let goldVermoegenEntwicklung = parseFloat(document.getElementById('goldVermoegen').value) || 0;
             let msciVermoegenEntwicklung = parseFloat(document.getElementById('msciVermoegen').value) || 0;
             let bitcoinVermoegenEntwicklung = parseFloat(document.getElementById('bitcoinVermoegen').value) || 0;
+            let aktuellesGesamtVermoegen = gesamtVermoegen;
 
             for (let jahr = 0; jahr <= anlagezeit; jahr++) {
                 tagesgeldEntwicklung.push(tagesgeldVermoegenEntwicklung);
                 goldEntwicklung.push(goldVermoegenEntwicklung);
                 msciEntwicklung.push(msciVermoegenEntwicklung);
                 bitcoinEntwicklung.push(bitcoinVermoegenEntwicklung);
+                gesamtEntwicklung.push(aktuellesGesamtVermoegen);
 
                 tagesgeldVermoegenEntwicklung += tagesgeldVermoegenEntwicklung * tagesgeldZins;
                 goldVermoegenEntwicklung += goldVermoegenEntwicklung * goldZins;
                 msciVermoegenEntwicklung += msciVermoegenEntwicklung * msciZins;
                 bitcoinVermoegenEntwicklung += bitcoinVermoegenEntwicklung * bitcoinZins;
+                aktuellesGesamtVermoegen = tagesgeldVermoegenEntwicklung + goldVermoegenEntwicklung + msciVermoegenEntwicklung + bitcoinVermoegenEntwicklung;
             }
 
             // Graph aktualisieren
@@ -137,7 +169,101 @@
             window.vermoegensentwicklungChart.data.datasets[1].data = goldEntwicklung;
             window.vermoegensentwicklungChart.data.datasets[2].data = msciEntwicklung;
             window.vermoegensentwicklungChart.data.datasets[3].data = bitcoinEntwicklung;
+            window.vermoegensentwicklungChart.data.datasets[4].data = gesamtEntwicklung;
             window.vermoegensentwicklungChart.update();
+        }
+
+        function updateYAxisScale(chart, newMaxValue) {
+            const currentMax = chart.options.scales.y.max || 0;
+            if (newMaxValue > currentMax) {
+                chart.options.scales.y.max = newMaxValue;
+            }
+        }
+
+        function berechneMitVolatilitaet() {
+            const tagesgeldZins = parseFloat(document.getElementById('tagesgeldZins').value) / 100 || 0;
+            const goldZins = parseFloat(document.getElementById('goldZins').value) / 100 || 0;
+            const msciZins = parseFloat(document.getElementById('msciZins').value) / 100 || 0;
+            const bitcoinZins = parseFloat(document.getElementById('bitcoinZins').value) / 100 || 0;
+            const anlagezeit = parseInt(document.getElementById('anlagezeit').value) || 0;
+
+            const tagesgeldVolatilitaet = parseFloat(document.getElementById('tagesgeldVolatilitaet').value) / 100 || 0;
+            const goldVolatilitaet = parseFloat(document.getElementById('goldVolatilitaet').value) / 100 || 0;
+            const msciVolatilitaet = parseFloat(document.getElementById('msciVolatilitaet').value) / 100 || 0;
+            const bitcoinVolatilitaet = parseFloat(document.getElementById('bitcoinVolatilitaet').value) / 100 || 0;
+
+            function randomNormal(mean, stdDev) {
+                let u1 = Math.random();
+                let u2 = Math.random();
+                let z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                return mean + z * stdDev;
+            }
+
+            const tagesgeldEntwicklungVolatil = [];
+            const goldEntwicklungVolatil = [];
+            const msciEntwicklungVolatil = [];
+            const bitcoinEntwicklungVolatil = [];
+            const gesamtEntwicklungVolatil = [];
+
+            let tagesgeldVermoegenVolatil = parseFloat(document.getElementById('tagesgeldVermoegen').value) || 0;
+            let goldVermoegenVolatil = parseFloat(document.getElementById('goldVermoegen').value) || 0;
+            let msciVermoegenVolatil = parseFloat(document.getElementById('msciVermoegen').value) || 0;
+            let bitcoinVermoegenVolatil = parseFloat(document.getElementById('bitcoinVermoegen').value) || 0;
+
+            for (let jahr = 0; jahr <= anlagezeit; jahr++) {
+                tagesgeldEntwicklungVolatil.push(Math.max(0, tagesgeldVermoegenVolatil));
+                goldEntwicklungVolatil.push(Math.max(0, goldVermoegenVolatil));
+                msciEntwicklungVolatil.push(Math.max(0, msciVermoegenVolatil));
+                bitcoinEntwicklungVolatil.push(Math.max(0, bitcoinVermoegenVolatil));
+                gesamtEntwicklungVolatil.push(
+                    Math.max(0, tagesgeldVermoegenVolatil) +
+                    Math.max(0, goldVermoegenVolatil) +
+                    Math.max(0, msciVermoegenVolatil) +
+                    Math.max(0, bitcoinVermoegenVolatil)
+                );
+
+                tagesgeldVermoegenVolatil += tagesgeldVermoegenVolatil * randomNormal(tagesgeldZins, tagesgeldVolatilitaet);
+                goldVermoegenVolatil += goldVermoegenVolatil * randomNormal(goldZins, goldVolatilitaet);
+                msciVermoegenVolatil += msciVermoegenVolatil * randomNormal(msciZins, msciVolatilitaet);
+                bitcoinVermoegenVolatil += bitcoinVermoegenVolatil * randomNormal(bitcoinZins, bitcoinVolatilitaet);
+
+                tagesgeldVermoegenVolatil = Math.max(0, tagesgeldVermoegenVolatil);
+                goldVermoegenVolatil = Math.max(0, goldVermoegenVolatil);
+                msciVermoegenVolatil = Math.max(0, msciVermoegenVolatil);
+                bitcoinVermoegenVolatil = Math.max(0, bitcoinVermoegenVolatil);
+            }
+
+            // Berechnung des maximalen Wertes
+            const maxVolatileValue = Math.max(...gesamtEntwicklungVolatil);
+
+            // Aktualisiere den Graphen für Volatilität
+            window.vermoegensentwicklungVolatilitaetChart.data.labels = Array.from({ length: anlagezeit + 1 }, (_, i) => `Jahr ${i}`);
+            window.vermoegensentwicklungVolatilitaetChart.data.datasets[0].data = tagesgeldEntwicklungVolatil;
+            window.vermoegensentwicklungVolatilitaetChart.data.datasets[1].data = goldEntwicklungVolatil;
+            window.vermoegensentwicklungVolatilitaetChart.data.datasets[2].data = msciEntwicklungVolatil;
+            window.vermoegensentwicklungVolatilitaetChart.data.datasets[3].data = bitcoinEntwicklungVolatil;
+            window.vermoegensentwicklungVolatilitaetChart.data.datasets[4].data = gesamtEntwicklungVolatil;
+
+            // Aktualisiere die y-Achse, falls nötig
+            updateYAxisScale(window.vermoegensentwicklungVolatilitaetChart, maxVolatileValue);
+
+            window.vermoegensentwicklungVolatilitaetChart.update();
+        }
+
+        // Entferne die automatische Aktualisierung des Graphen "vermoegensentwicklung-volatilitaet-graph"
+        if (window.volatileGraphInterval) {
+            clearInterval(window.volatileGraphInterval);
+        }
+
+        function berechneBeideGraphen() {
+            berechneOhneVolatilitaet();
+            berechneMitVolatilitaet();
+
+            // Starte die automatische Aktualisierung des Volatilitäts-Graphen alle 2 Sekunden
+            if (volatileGraphInterval) {
+                clearInterval(volatileGraphInterval);
+            }
+            volatileGraphInterval = setInterval(berechneMitVolatilitaet, 3000);
         }
     </script>
 
