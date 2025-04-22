@@ -59,67 +59,29 @@
     <h2>Vermögensentwicklung ohne Volatilität</h2>
     <canvas id="vermoegensentwicklung-graph" width="400" height="200"></canvas>
     <script>
-        // Initialisiere den Graphen ohne Werte
-        const ctx = document.getElementById('vermoegensentwicklung-graph').getContext('2d');
-        window.vermoegensentwicklungChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [], // Keine Labels vor der Berechnung
-                datasets: [
-                    {
-                        label: 'Tagesgeld (€)',
-                        data: [],
-                        borderColor: 'blue',
-                        borderWidth: 2,
-                        fill: false
-                    },
-                    {
-                        label: 'Gold (€)',
-                        data: [],
-                        borderColor: 'orange',
-                        borderWidth: 2,
-                        fill: false
-                    },
-                    {
-                        label: 'MSCI World (€)',
-                        data: [],
-                        borderColor: 'green',
-                        borderWidth: 2,
-                        fill: false
-                    },
-                    {
-                        label: 'Bitcoin (€)',
-                        data: [],
-                        borderColor: 'red',
-                        borderWidth: 2,
-                        fill: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    }
+        // Initialisiere den Graphen beim Laden der Seite
+        window.addEventListener('load', function () {
+            const ctxInvest = document.getElementById('vermoegensentwicklung-graph').getContext('2d');
+            window.vermoegensentwicklungChart = new Chart(ctxInvest, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Tagesgeld (€)', data: [], borderColor: 'blue', borderWidth: 2, fill: false },
+                        { label: 'Gold (€)', data: [], borderColor: 'orange', borderWidth: 2, fill: false },
+                        { label: 'MSCI World (€)', data: [], borderColor: 'green', borderWidth: 2, fill: false },
+                        { label: 'Bitcoin (€)', data: [], borderColor: 'red', borderWidth: 2, fill: false }
+                    ]
                 },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Anlagezeit (Jahre)'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Vermögen (€)'
-                        },
-                        beginAtZero: true
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true, position: 'top' } },
+                    scales: {
+                        x: { title: { display: true, text: 'Anlagezeit (Jahre)' } },
+                        y: { title: { display: true, text: 'Vermögen (€)' }, beginAtZero: true }
                     }
                 }
-            }
+            });
         });
     </script>
     <script>

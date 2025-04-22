@@ -96,10 +96,337 @@
         </script>
     </form>
 
+    <script>
+        // Initialisiere den Graphen für "Nettoeinkommen" ohne Werte
+        const ctxNettoeinkommen = document.getElementById('nettoeinkommen-graph').getContext('2d');
+        window.nettoeinkommenChart = new Chart(ctxNettoeinkommen, {
+            type: 'line',
+            data: {
+                labels: [], // Keine Labels vor der Berechnung
+                datasets: [
+                    {
+                        label: 'Nettoeinkommen (€)',
+                        data: [],
+                        borderColor: 'blue',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Lebensstandard (€)',
+                        data: [],
+                        borderColor: 'orange',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Sparrücklage (€)',
+                        data: [],
+                        borderColor: 'green',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Entfallende Ausgaben ab Renteneintritt (€)',
+                        data: [],
+                        borderColor: 'black',
+                        borderWidth: 2,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Jahre bis Rente'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Betrag (€)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
 
+        // Initialisiere den Graphen für "Vermögensaufbau" ohne Werte
+        const ctxVermoegensaufbau = document.getElementById('vermoegensaufbau-graph').getContext('2d');
+        window.vermoegensaufbauChart = new Chart(ctxVermoegensaufbau, {
+            type: 'line',
+            data: {
+                labels: [], // Keine Labels vor der Berechnung
+                datasets: [
+                    {
+                        label: 'Vermögen (€)',
+                        data: [],
+                        borderColor: 'blue',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Netto gespart (€)',
+                        data: [],
+                        borderColor: 'green',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Zinsen (€)',
+                        data: [],
+                        borderColor: 'purple',
+                        borderWidth: 2,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Jahre bis Rente'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Betrag (€)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
 
+        // Initialisiere den Graphen für "Bedarf und Rente ab Rente" ohne Werte
+        const ctxBedarfUndRente = document.getElementById('bedarf-und-rente-ab-rente-graph').getContext('2d');
+        window.bedarfUndRenteChart = new Chart(ctxBedarfUndRente, {
+            type: 'line',
+            data: {
+                labels: [], // Keine Labels vor der Berechnung
+                datasets: [
+                    {
+                        label: 'Lebensstandard ab Renteneintritt (€)',
+                        data: [],
+                        borderColor: 'orange',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Geschätzte Rente (€)',
+                        data: [],
+                        borderColor: 'blue',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Delta (= Lebensstandard - Rente) (€)',
+                        data: [],
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Jahre bis zum Tod'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Betrag (€)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
 
-    
+        // Initialisiere den Graphen für "Vermögensentwicklung ab Rente" ohne Werte
+        const ctxVermoegensentwicklung = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
+        window.vermoegensentwicklungChart = new Chart(ctxVermoegensentwicklung, {
+            type: 'line',
+            data: {
+                labels: [], // Keine Labels vor der Berechnung
+                datasets: [
+                    {
+                        label: 'Vermögen (€)',
+                        data: [],
+                        borderColor: 'blue',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Vermögen ohne Entnahme (€)',
+                        data: [],
+                        borderColor: 'green',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Entnommenes Vermögen insgesamt (€)',
+                        data: [],
+                        borderColor: 'orange',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Entnahme pro Jahr (€)',
+                        data: [],
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Jahre bis zum Tod'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Betrag (€)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+    <script>
+        // Initialisiere alle Graphen beim Laden der Seite
+        window.addEventListener('load', function () {
+            const ctxNettoeinkommen = document.getElementById('nettoeinkommen-graph').getContext('2d');
+            window.nettoeinkommenChart = new Chart(ctxNettoeinkommen, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Nettoeinkommen (€)', data: [], borderColor: 'blue', borderWidth: 2, fill: false },
+                        { label: 'Lebensstandard (€)', data: [], borderColor: 'orange', borderWidth: 2, fill: false },
+                        { label: 'Sparrücklage (€)', data: [], borderColor: 'green', borderWidth: 2, fill: false },
+                        { label: 'Entfallende Ausgaben ab Renteneintritt (€)', data: [], borderColor: 'black', borderWidth: 2, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true, position: 'top' } },
+                    scales: {
+                        x: { title: { display: true, text: 'Jahre bis Rente' } },
+                        y: { title: { display: true, text: 'Betrag (€)' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            const ctxVermoegensaufbau = document.getElementById('vermoegensaufbau-graph').getContext('2d');
+            window.vermoegensaufbauChart = new Chart(ctxVermoegensaufbau, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Vermögen (€)', data: [], borderColor: 'blue', borderWidth: 2, fill: false },
+                        { label: 'Netto gespart (€)', data: [], borderColor: 'green', borderWidth: 2, fill: false },
+                        { label: 'Zinsen (€)', data: [], borderColor: 'purple', borderWidth: 2, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true, position: 'top' } },
+                    scales: {
+                        x: { title: { display: true, text: 'Jahre bis Rente' } },
+                        y: { title: { display: true, text: 'Betrag (€)' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            const ctxBedarfUndRente = document.getElementById('bedarf-und-rente-ab-rente-graph').getContext('2d');
+            window.bedarfUndRenteChart = new Chart(ctxBedarfUndRente, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Lebensstandard ab Renteneintritt (€)', data: [], borderColor: 'orange', borderWidth: 2, fill: false },
+                        { label: 'Geschätzte Rente (€)', data: [], borderColor: 'blue', borderWidth: 2, fill: false },
+                        { label: 'Delta (= Lebensstandard - Rente) (€)', data: [], borderColor: 'red', borderWidth: 2, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true, position: 'top' } },
+                    scales: {
+                        x: { title: { display: true, text: 'Jahre bis zum Tod' } },
+                        y: { title: { display: true, text: 'Betrag (€)' }, beginAtZero: true }
+                    }
+                }
+            });
+
+            const ctxVermoegensentwicklung = document.getElementById('vermoegensentwicklung-ab-rente-graph').getContext('2d');
+            window.vermoegensentwicklungChart = new Chart(ctxVermoegensentwicklung, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Vermögen (€)', data: [], borderColor: 'blue', borderWidth: 2, fill: false },
+                        { label: 'Vermögen ohne Entnahme (€)', data: [], borderColor: 'green', borderWidth: 2, fill: false },
+                        { label: 'Entnommenes Vermögen insgesamt (€)', data: [], borderColor: 'orange', borderWidth: 2, fill: false },
+                        { label: 'Entnahme pro Jahr (€)', data: [], borderColor: 'red', borderWidth: 2, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true, position: 'top' } },
+                    scales: {
+                        x: { title: { display: true, text: 'Jahre bis zum Tod' } },
+                        y: { title: { display: true, text: 'Betrag (€)' }, beginAtZero: true }
+                    }
+                }
+            });
+        });
+    </script>
+
     <div id="berechnete-werte-bis-rente">
         <h2>Monatlicher Bedarf bis Renteneintritt</h2>
         <canvas id="nettoeinkommen-graph"></canvas>
